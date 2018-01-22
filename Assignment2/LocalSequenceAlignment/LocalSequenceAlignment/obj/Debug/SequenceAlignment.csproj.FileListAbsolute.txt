@@ -1,0 +1,6 @@
+C:\Users\nsathya\Desktop\CSE527\Assignment2\v5\LocalSequenceAlignment\LocalSequenceAlignment\bin\Debug\LocalSequenceAlignment.exe.config
+C:\Users\nsathya\Desktop\CSE527\Assignment2\v5\LocalSequenceAlignment\LocalSequenceAlignment\bin\Debug\LocalSequenceAlignment.exe
+C:\Users\nsathya\Desktop\CSE527\Assignment2\v5\LocalSequenceAlignment\LocalSequenceAlignment\bin\Debug\LocalSequenceAlignment.pdb
+C:\Users\nsathya\Desktop\CSE527\Assignment2\v5\LocalSequenceAlignment\LocalSequenceAlignment\obj\Debug\LocalSequenceAlignment.exe
+C:\Users\nsathya\Desktop\CSE527\Assignment2\v5\LocalSequenceAlignment\LocalSequenceAlignment\obj\Debug\LocalSequenceAlignment.pdb
+C:\Users\nsathya\Desktop\CSE527\Assignment2\v5\LocalSequenceAlignment\LocalSequenceAlignment\obj\Debug\SequenceAlignment.csprojResolveAssemblyReference.cache
