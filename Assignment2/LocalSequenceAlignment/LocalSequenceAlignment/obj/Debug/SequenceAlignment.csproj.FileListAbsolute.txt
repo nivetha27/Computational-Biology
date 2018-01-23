@@ -4,3 +4,9 @@ C:\Users\nsathya\Desktop\CSE527\Assignment2\v5\LocalSequenceAlignment\LocalSeque
 C:\Users\nsathya\Desktop\CSE527\Assignment2\v5\LocalSequenceAlignment\LocalSequenceAlignment\obj\Debug\LocalSequenceAlignment.exe
 C:\Users\nsathya\Desktop\CSE527\Assignment2\v5\LocalSequenceAlignment\LocalSequenceAlignment\obj\Debug\LocalSequenceAlignment.pdb
 C:\Users\nsathya\Desktop\CSE527\Assignment2\v5\LocalSequenceAlignment\LocalSequenceAlignment\obj\Debug\SequenceAlignment.csprojResolveAssemblyReference.cache
+C:\Users\nsathya\Documents\GitHub\Computational-Biology\Assignment2\LocalSequenceAlignment\LocalSequenceAlignment\bin\Debug\LocalSequenceAlignment.exe.config
+C:\Users\nsathya\Documents\GitHub\Computational-Biology\Assignment2\LocalSequenceAlignment\LocalSequenceAlignment\obj\Debug\LocalSequenceAlignment.exe
+C:\Users\nsathya\Documents\GitHub\Computational-Biology\Assignment2\LocalSequenceAlignment\LocalSequenceAlignment\obj\Debug\LocalSequenceAlignment.pdb
+C:\Users\nsathya\Documents\GitHub\Computational-Biology\Assignment2\LocalSequenceAlignment\LocalSequenceAlignment\bin\Debug\LocalSequenceAlignment.exe
+C:\Users\nsathya\Documents\GitHub\Computational-Biology\Assignment2\LocalSequenceAlignment\LocalSequenceAlignment\bin\Debug\LocalSequenceAlignment.pdb
+C:\Users\nsathya\Documents\GitHub\Computational-Biology\Assignment2\LocalSequenceAlignment\LocalSequenceAlignment\obj\Debug\SequenceAlignment.csprojResolveAssemblyReference.cache
