@@ -149,7 +149,7 @@ namespace SequenceAlignment
     private static string permuteString(string s) {
       char[] c = s.ToCharArray();
       for(int i = c.Length -1 ; i> 0; i--) {
-        int j = rnd.Next(0,i);
+        int j = rnd.Next(0,i+1);
         char tmp = c[i];
         c[i] = c[j];
         c[j] = tmp;
