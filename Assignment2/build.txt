@@ -1,0 +1,15 @@
+This assignment is written in C#
+
+This assignment contains solutions for :
+1. local sequence alignment
+2. global sequence alignment
+3. Naive shuffle vs Knuth-Fisher-Yates shuffle
+
+1. To build and run the solutions, please unzip the file
+2. Local/Global sequence alignment solution can be found in Assignment2\LocalSequenceAlignment and the Naive shuffle vs Knuth-Fisher-Yates shuffle
+ can be found in \Assignment2\NaiveShuffle
+3. To run the local sequence alignment either launch the solutions in IDE and run it through that or directly run Assignment2\LocalSequenceAlignment\LocalSequenceAlignment\bin\Debug\LocalSequenceAlignment.exe
+4. Once the console window is launched, it prompts to update the directory path from which *.fasta files can be read. Please NOTE this program can read only fasta format files.
+5. Upon updating the path, you will be given options to run local/global/both/empirical p-value/none. Please select the options accordingly. 
+6. For local/global sequence alignment you can either give a pair of identifiers that you would like to see the output for else it will default to running for all the 10 protein sequences. Please NOTE that the input has to be the identifier and please ensure that the fasta formatted file with that identifer name exists.
+7. For empirical p-value, please provide a pair of identifiers to be run on.

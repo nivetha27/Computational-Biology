@@ -21,7 +21,7 @@ namespace SequenceAlignment
       }
 
       List<Protein> proteins = null;
-      Console.WriteLine("Select an option \n 1) local sequence alignment \n 2) global sequence alignment \n 3) all \n 4) none");
+      Console.WriteLine("Select an option \n 1) local sequence alignment \n 2) global sequence alignment \n 3) local and global \n 4) emperical p-value \n 5) none");
       int alignmentOption = Convert.ToInt32(Console.ReadLine());
       if (alignmentOption < 4) {
         Console.WriteLine("Assuming required files exists, by default will run the local sequence alignment using protein sequences - P15172	P17542	P10085	P16075	P13904	Q90477	Q8IU24	P22816	Q10574	O95363");
@@ -42,12 +42,9 @@ namespace SequenceAlignment
         if (alignmentOption == 2 || alignmentOption == 3) {
           Console.WriteLine("\nRunning global sequence Alignment ... ");
           Controller.runGlobalSequence(proteins);
-        }
+        }        
       }
-
-      Console.WriteLine("Do you want to get emperical p-value for a pair of proteins ?(y/n)");
-      s = Console.ReadLine();
-      if (s.ToUpper() == "Y") {
+      if (alignmentOption == 4) {
         Console.WriteLine("Enter identifiers as comma separated list with at least two identifiers (ex: P15172,P17542) ");
         s = Console.ReadLine();
         proteins = FastaFileProcessor.getAllProteinSeqFromFile(s.Split(new char [] {','}, StringSplitOptions.RemoveEmptyEntries));
