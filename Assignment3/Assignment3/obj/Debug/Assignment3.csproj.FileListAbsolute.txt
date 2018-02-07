@@ -1,0 +1,6 @@
+C:\Users\nsathya\Documents\GitHub\Computational-Biology\Assignment3\Assignment3\bin\Debug\Assignment3.exe.config
+C:\Users\nsathya\Documents\GitHub\Computational-Biology\Assignment3\Assignment3\bin\Debug\Assignment3.exe
+C:\Users\nsathya\Documents\GitHub\Computational-Biology\Assignment3\Assignment3\bin\Debug\Assignment3.pdb
+C:\Users\nsathya\Documents\GitHub\Computational-Biology\Assignment3\Assignment3\obj\Debug\Assignment3.csprojResolveAssemblyReference.cache
+C:\Users\nsathya\Documents\GitHub\Computational-Biology\Assignment3\Assignment3\obj\Debug\Assignment3.exe
+C:\Users\nsathya\Documents\GitHub\Computational-Biology\Assignment3\Assignment3\obj\Debug\Assignment3.pdb

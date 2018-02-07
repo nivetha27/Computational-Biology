@@ -1,0 +1,6 @@
+C:\Users\nsathya\Desktop\CSE546P-ML\Machine-Learning-Assignments\Assignment 3\NaiveShuffle\NaiveShuffle\bin\Debug\NaiveShuffle.exe.config
+C:\Users\nsathya\Desktop\CSE546P-ML\Machine-Learning-Assignments\Assignment 3\NaiveShuffle\NaiveShuffle\obj\Debug\NaiveShuffle.csprojResolveAssemblyReference.cache
+C:\Users\nsathya\Desktop\CSE546P-ML\Machine-Learning-Assignments\Assignment 3\NaiveShuffle\NaiveShuffle\bin\Debug\NaiveShuffle.exe
+C:\Users\nsathya\Desktop\CSE546P-ML\Machine-Learning-Assignments\Assignment 3\NaiveShuffle\NaiveShuffle\bin\Debug\NaiveShuffle.pdb
+C:\Users\nsathya\Desktop\CSE546P-ML\Machine-Learning-Assignments\Assignment 3\NaiveShuffle\NaiveShuffle\obj\Debug\NaiveShuffle.exe
+C:\Users\nsathya\Desktop\CSE546P-ML\Machine-Learning-Assignments\Assignment 3\NaiveShuffle\NaiveShuffle\obj\Debug\NaiveShuffle.pdb
