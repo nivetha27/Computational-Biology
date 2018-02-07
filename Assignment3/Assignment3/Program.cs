@@ -23,15 +23,20 @@ namespace Assignment3
     static void Main(string[] args)
     { 
       input = sample.Split(' ').Select(n => double.Parse(n)).ToArray();
-      for (int i = 5; i <=5; i++) {
+      for (int i = 1; i <= 5; i++) {
+        Console.WriteLine(i);
         numClass = i;
         meanArr = new double[numClass];
         stddevArr = new double[numClass];
         initializeCluster();
         initialize();
+        //for(int j = 0; j < expectedMatrix.Length; i++) {
+        //  Console.Write(addTrailingSpace(input[j]));
+        //  print(expectedMatrix[j]);
+        //}
       }
-      // Console.WriteLine("Press any key to exit....");
-      // Console.ReadLine();
+      Console.WriteLine("Press any key to exit....");
+      Console.ReadLine();
     }
 
     public static void initializeCluster() {
@@ -48,15 +53,17 @@ namespace Assignment3
     }
 
     public static void initialize() {
-      double? prev = null;
-      double? cur = null;
+      double? prevLikelihood = null;
+      double? curLikelihood = null;
       do {
-        if (cur != null) {
-          prev = Convert.ToDouble(cur);
+        if (curLikelihood != null) {
+          prevLikelihood = Convert.ToDouble(curLikelihood);
         }
         // E-Step
         normalDensityMatrix = new double[input.Length][];
         nomralDensitySumMatrix = new double[input.Length];
+        expectedMatrix = new double[input.Length][];
+
         for (int row = 0; row < input.Length; row++) {
           normalDensityMatrix[row] = new double[numClass];
           nomralDensitySumMatrix[row] = 0;
@@ -65,7 +72,6 @@ namespace Assignment3
             nomralDensitySumMatrix[row] += normalDensityMatrix[row][col];
           }
         }
-        expectedMatrix = new double[input.Length][];
         for (int row = 0; row < input.Length; row++) {
           expectedMatrix[row] = new double[numClass];  
           for (int col = 0; col < numClass; col++) {
@@ -73,9 +79,10 @@ namespace Assignment3
           }
         }
         print(meanArr);
-        cur = computeLogLikelihood();
-        Console.Write(cur);
-        Console.Write(computeBIC(Convert.ToDouble(cur)));
+        var l = computeLogLikelihood();
+        curLikelihood = l;
+        Console.Write(addTrailingSpace(l));
+        Console.Write(computeBIC(Convert.ToDouble(curLikelihood)).ToString("N3"));
         Console.WriteLine();
 
         // M-Step
@@ -88,7 +95,7 @@ namespace Assignment3
           }
           meanArr[col] /= denom;
         }
-      } while (shouldTerminate(prev, cur));
+      } while (shouldTerminate(prevLikelihood, curLikelihood));
     }
 
     public static bool shouldTerminate(double? prev, double? cur) {
@@ -150,7 +157,7 @@ namespace Assignment3
     }
 
     private static string addTrailingSpace(double val, int maxLen = 35) {
-      StringBuilder x = new StringBuilder(val.ToString(), maxLen);
+      StringBuilder x = new StringBuilder(val.ToString("N12"), maxLen);
       for (int i = 1; i <= (maxLen - x.Length); i++) {
         x.Append(" ");
       }
