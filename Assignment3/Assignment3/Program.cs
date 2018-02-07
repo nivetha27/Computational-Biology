@@ -8,98 +8,104 @@ namespace Assignment3
 {
   class Program
   {
+    public static Random rand = new Random();
+    public static double epsilon = 0.001;
     public static readonly int numIter = 11;
     static int numClass = 5;
     public static readonly double normalDensityConst = Math.Sqrt(1/(2 * Math.PI));
-    public static double[] input = new double[]  {9,10,11,20,21,22,46,49,55,57};  // {-6,-5,-4,0,4,5,6}; 
-    public static double[][] meanArr = new double[numIter + 1][];
-    public static double[] stddevArr = new double[numClass];
-    static double[][][] normalDensityMatrix = new double[numIter][][];
-    static double[][] nomralDensitySumMatrix = new double[numIter][];
-    static double[][][] expectedMatrix = new double[numIter][][];
+    public static string sample = "9 10 11 20 21 22 46 49 55 57"; // -6 -5 -4 0 4 5 6
+    public static double[] input;
+    public static double[] meanArr;
+    public static double[] stddevArr;
+    static double[][] normalDensityMatrix;
+    static double[] nomralDensitySumMatrix;
+    static double[][] expectedMatrix;
     static void Main(string[] args)
-    {      
-      initializeCluster();
-      initialize();
+    { 
+      input = sample.Split(' ').Select(n => double.Parse(n)).ToArray();
+      for (int i = 5; i <=5; i++) {
+        numClass = i;
+        meanArr = new double[numClass];
+        stddevArr = new double[numClass];
+        initializeCluster();
+        initialize();
+      }
       // Console.WriteLine("Press any key to exit....");
       // Console.ReadLine();
-      print(meanArr);
     }
 
     public static void initializeCluster() {
-      //int numSamples = input.Length/numClass;
-      //meanArr[0] = new double[2] { -20.0, 6.0}; // new double[numClass];
-      //for (int i = 0; i < numClass; i++) {
-      //  int start = i * numSamples;
-      //  int end = (start + numSamples);
-      //  if (i == numClass - 1) {
-      //    end = input.Length;  
-      //  }
-      //  // meanArr[0][i] =  computeMean(start, end);
-      //  stddevArr[i] = 1.0; //computeStddev(start, end, i);
-      //}
+      var min = input.Min();
+      var max = input.Max();
 
-      //var rand = new Random();
-      //  meanArr[0] = new double[numClass];
-      //var min = input.Min();
-      //var max = input.Max();
-
-      //for (int i = 0; i < numClass; i++)
-      //{
-      //    meanArr[0][i] = rand.Next((int)min, (int)max);
-      //    stddevArr[i] = 1.0;
-      //}
-      meanArr[0] = new double[5] { 35,12,46,22,45  }; 
-      stddevArr = new double[5] {1,1,1,1,1};
+      for (int i = 0; i<numClass; i++)
+      {
+          meanArr[i] = rand.Next((int)min, (int)max);
+          stddevArr[i] = 1.0;
+      }
+      //meanArr = new double[5] { 35,12,46,22,45}; 
+      //stddevArr = new double[5] {1,1,1,1,1};
     }
 
     public static void initialize() {
-      for (int iter = 0; iter < numIter; iter++) {
-       // E-Step
-        normalDensityMatrix[iter] = new double[input.Length][];
-        nomralDensitySumMatrix[iter] = new double[input.Length];
+      double? prev = null;
+      double? cur = null;
+      do {
+        if (cur != null) {
+          prev = Convert.ToDouble(cur);
+        }
+        // E-Step
+        normalDensityMatrix = new double[input.Length][];
+        nomralDensitySumMatrix = new double[input.Length];
         for (int row = 0; row < input.Length; row++) {
-          normalDensityMatrix[iter][row] = new double[numClass];
-          nomralDensitySumMatrix[iter][row] = 0;
+          normalDensityMatrix[row] = new double[numClass];
+          nomralDensitySumMatrix[row] = 0;
           for (int col = 0; col < numClass; col++) {
-            normalDensityMatrix[iter][row][col] =  normalDensity(input[row], meanArr[iter][col],stddevArr[col]);
-            nomralDensitySumMatrix[iter][row] += normalDensityMatrix[iter][row][col];
+            normalDensityMatrix[row][col] =  normalDensity(input[row], meanArr[col],stddevArr[col]);
+            nomralDensitySumMatrix[row] += normalDensityMatrix[row][col];
           }
         }
-        expectedMatrix[iter] = new double[input.Length][];
+        expectedMatrix = new double[input.Length][];
         for (int row = 0; row < input.Length; row++) {
-          expectedMatrix[iter][row] = new double[numClass];  
+          expectedMatrix[row] = new double[numClass];  
           for (int col = 0; col < numClass; col++) {
-            expectedMatrix[iter][row][col] =  normalDensityMatrix[iter][row][col]/nomralDensitySumMatrix[iter][row];
+            expectedMatrix[row][col] =  normalDensityMatrix[row][col]/nomralDensitySumMatrix[row];
           }
         }
+        print(meanArr);
+        cur = computeLogLikelihood();
+        Console.Write(cur);
+        Console.Write(computeBIC(Convert.ToDouble(cur)));
+        Console.WriteLine();
 
         // M-Step
-        int idx = iter + 1;
-        meanArr[idx] = new double[numClass];
+        meanArr = new double[numClass];
         for (int col = 0; col < numClass; col++) {
           double denom = 0;
           for (int row = 0; row < input.Length; row++) {
-            meanArr[idx][col] += expectedMatrix[iter][row][col] * input[row];
-            denom += expectedMatrix[iter][row][col];
+            meanArr[col] += expectedMatrix[row][col] * input[row];
+            denom += expectedMatrix[row][col];
           }
-          meanArr[idx][col] /= denom;
+          meanArr[col] /= denom;
         }
-
-        double logLikelihood = (computeLogLikelihood(iter));
-        Console.Write(logLikelihood);
-        Console.WriteLine(computeBIC(logLikelihood));
-      }
+      } while (shouldTerminate(prev, cur));
     }
 
-    public static double computeLogLikelihood(int iterNum, double stddev = 1.0) {
+    public static bool shouldTerminate(double? prev, double? cur) {
+      if (prev == null || cur == null)
+        return true;
+      double diff = Convert.ToDouble(cur) - Convert.ToDouble(prev);
+      return diff > epsilon ? true : false;
+    }
+
+    public static double computeLogLikelihood(double stddev = 1.0) {
       double logLikelihood = 0;
-      for (int i = 0; i < normalDensityMatrix[0].Length; i++)
+      for (int i = 0; i < normalDensityMatrix.Length; i++)
       {
         double sum = 0;
-        for (int j = 0; j < normalDensityMatrix[0][0].Length; j++)
+        for (int j = 0; j < normalDensityMatrix[0].Length; j++)
         {
-          sum += (1.0 / numClass * normalDensityMatrix[iterNum][i][j]);
+          sum += (1.0 / numClass * normalDensityMatrix[i][j]);
         }
         logLikelihood += Math.Log(sum);
       }
@@ -129,20 +135,18 @@ namespace Assignment3
     public static double computeStddev(int s, int e, int meanIdx) {
       double stddev = 0.0;
       for (int i = s; i < e; i++) {
-        stddev += Math.Pow(input[i] - meanArr[0][meanIdx],2);
+        stddev += Math.Pow(input[i] - meanArr[meanIdx],2);
       }
       stddev/= (e - s - 1);
       stddev = Math.Sqrt(stddev);
       return stddev;
     }
 
-    private static void print(double[][] arr) {
-      for (int i = 0; i < arr.Length; i++) {
-        for (int j = 0; j < arr[0].Length; j++) {
-          Console.Write(addTrailingSpace(arr[i][j]));
-        }
-        Console.WriteLine();
+    private static void print(double[] arr) {
+      for (int j = 0; j < arr.Length; j++) {
+        Console.Write(addTrailingSpace(arr[j]));
       }
+      double logLikelihood = (computeLogLikelihood());
     }
 
     private static string addTrailingSpace(double val, int maxLen = 35) {
