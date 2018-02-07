@@ -13,27 +13,39 @@ namespace Assignment3
     public static readonly int numIter = 11;
     static int numClass = 5;
     public static readonly double normalDensityConst = Math.Sqrt(1/(2 * Math.PI));
-    public static string sample = "9 10 11 20 21 22 46 49 55 57"; // -6 -5 -4 0 4 5 6
+    public static string sample = "14.04 14.71 15.26 13.85 15.2 15.03 15.09 16.12 13.78 16.27 20.26 19.87 20.28 21.25 21.15 20.69 20.05 20.35 22.22 21.2 23.84 23.12 24.59 21.67 24.03 23.52 27.32 27.02 24.86 22.73";
+    // public static string sample = "9 10 11 20 21 22 46 49 55 57"; // -6 -5 -4 0 4 5 6
+    public static List<List<double>> meanLogLikBICList;
     public static double[] input;
     public static double[] meanArr;
     public static double[] stddevArr;
     static double[][] normalDensityMatrix;
     static double[] nomralDensitySumMatrix;
     static double[][] expectedMatrix;
+    public static int maxMeanLength; // needed for printing;
+    public static int maxExpectedLength; //needed for printing;
     static void Main(string[] args)
     { 
       input = sample.Split(' ').Select(n => double.Parse(n)).ToArray();
       for (int i = 1; i <= 5; i++) {
+        maxMeanLength = maxExpectedLength = Int32.MinValue;
+        meanLogLikBICList = new List<List<double>>();
+
         Console.WriteLine(i);
         numClass = i;
         meanArr = new double[numClass];
         stddevArr = new double[numClass];
-        initializeCluster();
+        // Initializes mean and stddev.
+        initializeCluster();        
+
+        // Runs EM.
         initialize();
-        //for(int j = 0; j < expectedMatrix.Length; i++) {
-        //  Console.Write(addTrailingSpace(input[j]));
-        //  print(expectedMatrix[j]);
-        //}
+
+        // Print data.
+        maxMeanLength +=5;
+        printMeanMatrix();
+        maxExpectedLength +=5;
+        printExpectedMatrix();
       }
       Console.WriteLine("Press any key to exit....");
       Console.ReadLine();
@@ -42,12 +54,13 @@ namespace Assignment3
     public static void initializeCluster() {
       var min = input.Min();
       var max = input.Max();
-
-      for (int i = 0; i<numClass; i++)
-      {
-          meanArr[i] = rand.Next((int)min, (int)max);
-          stddevArr[i] = 1.0;
+      for (int i = 0; i < numClass; i++)
+      { 
+        meanArr[i] = rand.Next((int)min, (int)max);
+        stddevArr[i] = 1.0;
+        maxMeanLength = Math.Max(maxMeanLength, meanArr[i].ToString().Length);
       }
+      meanLogLikBICList.Add(meanArr.ToList<double>());
       //meanArr = new double[5] { 35,12,46,22,45}; 
       //stddevArr = new double[5] {1,1,1,1,1};
     }
@@ -76,14 +89,17 @@ namespace Assignment3
           expectedMatrix[row] = new double[numClass];  
           for (int col = 0; col < numClass; col++) {
             expectedMatrix[row][col] =  normalDensityMatrix[row][col]/nomralDensitySumMatrix[row];
+            maxExpectedLength = Math.Max(maxExpectedLength, expectedMatrix[row][col].ToString().Length);
           }
         }
-        print(meanArr);
+        // print(meanArr, maxMeanLength);
         var l = computeLogLikelihood();
         curLikelihood = l;
-        Console.Write(addTrailingSpace(l));
-        Console.Write(computeBIC(Convert.ToDouble(curLikelihood)).ToString("N3"));
-        Console.WriteLine();
+        meanLogLikBICList.Last().Add(l);
+        maxMeanLength = Math.Max(maxMeanLength, l.ToString().Length);
+        var b = computeBIC(l); 
+        meanLogLikBICList.Last().Add(b);
+        maxMeanLength = Math.Max(maxMeanLength, b.ToString().Length);
 
         // M-Step
         meanArr = new double[numClass];
@@ -94,8 +110,11 @@ namespace Assignment3
             denom += expectedMatrix[row][col];
           }
           meanArr[col] /= denom;
+          maxMeanLength = Math.Max(maxMeanLength, meanArr[col].ToString().Length);
         }
+        meanLogLikBICList.Add(meanArr.ToList<double>());
       } while (shouldTerminate(prevLikelihood, curLikelihood));
+      meanLogLikBICList.Remove(meanLogLikBICList.Last());
     }
 
     public static bool shouldTerminate(double? prev, double? cur) {
@@ -149,20 +168,52 @@ namespace Assignment3
       return stddev;
     }
 
-    private static void print(double[] arr) {
-      for (int j = 0; j < arr.Length; j++) {
-        Console.Write(addTrailingSpace(arr[j]));
+    private static void printMeanMatrix() {
+      for (int j = 0; j < meanArr.Length; j++) {
+        var x = "mu" + (j+1);
+        Console.Write(addTrailingWhitespace(x, maxMeanLength - x.Length));
       }
-      double logLikelihood = (computeLogLikelihood());
+      Console.Write(addTrailingWhitespace("LogLik", maxMeanLength - 6));
+      Console.Write(addTrailingWhitespace("BIC", maxMeanLength - 3));
+      Console.WriteLine();
+      for (int j = 0; j < meanLogLikBICList.Count(); j++)
+      { 
+        print(meanLogLikBICList[j].ToArray<double>(), maxMeanLength);
+        Console.WriteLine();
+      }
     }
 
-    private static string addTrailingSpace(double val, int maxLen = 35) {
-      StringBuilder x = new StringBuilder(val.ToString("N12"), maxLen);
-      for (int i = 1; i <= (maxLen - x.Length); i++) {
-        x.Append(" ");
+    private static void printExpectedMatrix() {
+      Console.Write(addTrailingWhitespace(" ", maxExpectedLength));
+      Console.Write(addTrailingWhitespace("xi", maxExpectedLength - "xi".Length));
+      for (int j =1; j <= numClass; j++) {
+          var x = String.Format("P(cls {0} | xi)", (j).ToString());
+          Console.Write(addTrailingWhitespace(x, maxExpectedLength - x.Length));
       }
+      Console.WriteLine();
 
-      return x.ToString();
+      for (int j = 0; j < expectedMatrix.Length; j++)
+      { 
+        var x = String.Format("[{0},]", (j + 1).ToString());
+        Console.Write(addTrailingWhitespace(x, maxExpectedLength - x.Length));
+        Console.Write(addTrailingWhitespace(input[j].ToString(), maxExpectedLength - input[j].ToString().Length));
+        print(expectedMatrix[j], maxExpectedLength);
+        Console.WriteLine();
+      }
+    }
+
+    private static void print(double[] arr, int count) {
+      for (int j = 0; j < arr.Length; j++) {
+        Console.Write(addTrailingWhitespace(arr[j].ToString(), count - arr[j].ToString().Length));
+      }
+    }
+
+    private static string addTrailingWhitespace(string x, int count) {
+      StringBuilder s = new StringBuilder(x);
+      for(int i = 1; i <=count; i++) {
+        s.Append(" ");
+      }
+      return s.ToString();
     }
   }
 }
