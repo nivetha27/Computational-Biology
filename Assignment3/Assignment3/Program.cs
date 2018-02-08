@@ -24,6 +24,8 @@ namespace Assignment3
     static double[][] expectedMatrix;
     public static int maxMeanLength; // needed for printing;
     public static int maxExpectedLength; //needed for printing;
+    public static double maxBicScore = Int32.MinValue;
+    public static int kWithMaxBicScore;
     static void Main(string[] args)
     { 
       input = sample.Split(' ').Select(n => double.Parse(n)).ToArray();
@@ -47,6 +49,8 @@ namespace Assignment3
         maxExpectedLength +=5;
         printExpectedMatrix();
       }
+
+      Console.WriteLine(String.Format("k = {0} has best BIC Score of {1}", kWithMaxBicScore, maxBicScore));
       Console.WriteLine("Press any key to exit....");
       Console.ReadLine();
     }
@@ -55,14 +59,12 @@ namespace Assignment3
       var min = input.Min();
       var max = input.Max();
       for (int i = 0; i < numClass; i++)
-      { 
+      {
         meanArr[i] = rand.Next((int)min, (int)max);
         stddevArr[i] = 1.0;
         maxMeanLength = Math.Max(maxMeanLength, meanArr[i].ToString().Length);
       }
       meanLogLikBICList.Add(meanArr.ToList<double>());
-      //meanArr = new double[5] { 35,12,46,22,45}; 
-      //stddevArr = new double[5] {1,1,1,1,1};
     }
 
     public static void initialize() {
@@ -100,6 +102,10 @@ namespace Assignment3
         var b = computeBIC(l); 
         meanLogLikBICList.Last().Add(b);
         maxMeanLength = Math.Max(maxMeanLength, b.ToString().Length);
+        if (maxBicScore < b) {
+          maxBicScore = b;
+          kWithMaxBicScore = meanArr.Length;
+        }
 
         // M-Step
         meanArr = new double[numClass];
