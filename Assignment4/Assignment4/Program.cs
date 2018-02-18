@@ -18,22 +18,22 @@ namespace Assignment4
   }
   class Program
   {
-    public const int numCharsToPrintPerLine = 80;
+    public const int numCharsToPrintPerLine = 60;
     public static char defaultCharReplaceNonACGT = 'T';
     public const int numStates = 2;
     public const int state1 = 0;
     public const int state2 = 1;
-    public static string sequences = "315116246446644245311321631164152133625144543631656626566666651166453132651245636664631636663162326455236266666625151631222555441666566563564324364131513465146353411126414626253356366163666466232534413661661163252562462255265252266435353336233121625364414432335163243633665562466662632666612355245242";
-    // public static string sequences = "316664";
+    // public static string sequences = "315116246446644245311321631164152133625144543631656626566666651166453132651245636664631636663162326455236266666625151631222555441666566563564324364131513465146353411126414626253356366163666466232534413661661163252562462255265252266435353336233121625364414432335163243633665562466662632666612355245242";
+    public static string sequences = "316664";
     public static double[,] HMMParams;
     public static Dictionary<char, double[]> emissionStates = new Dictionary<char, double[]>();
     public static int maxLenInRolls = Int32.MinValue;
-    public static double[][] rolls = new double[numStates][];
+    public static StateEstimation[][] rolls = new StateEstimation[numStates][];
     static void Main(string[] args)
     {
-      initializeTestTransitionAndEmissionStates();
-      // initializeTransitionAndEmissionStates();
-      // sequences = readAFastaFile(@"C:\Users\nsathya\Documents\GitHub\Computational-Biology\Assignment4\Assignment4\GCF_000091665.1_ASM9166v1_genomic.fna");
+      // initializeTestTransitionAndEmissionStates();
+      initializeTransitionAndEmissionStates();
+      sequences = readAFastaFile(@"C:\Users\nsathya\Documents\GitHub\Computational-Biology\Assignment4\Assignment4\GCF_000091665.1_ASM9166v1_genomic.fna");
       // Console.WriteLine(sequences);
 
       initializeTransitionEmissionArray();
@@ -57,20 +57,22 @@ namespace Assignment4
 
     public static void initializeTransitionEmissionArray() {
       for (int i = 0; i < numStates; i++)
-        rolls[i] = new double[sequences.Length];
+        rolls[i] = new StateEstimation[sequences.Length];
 
       for (int col = 0; col < sequences.Length; col++) {
         for (int row = 0; row < numStates; row++) {
           char c = validateSequenceChar(sequences[col]);
+          rolls[row][col] = new StateEstimation(numStates);
           if (col == 0) {
-            rolls[row][col] = (HMMParams[numStates, row]) * (emissionStates[c][row]);
+            rolls[row][col].value = (HMMParams[numStates, row]) * (emissionStates[c][row]);
             // rolls[row][col] = Math.Log(HMMParams[numStates, row]) + Math.Log(emissionStates[c][row]);
           } else {
-            rolls[row][col] = Double.MinValue;
+            rolls[row][col].value = Double.MinValue;
             for (int i = 0; i < numStates; i++) {
-              double stateValues = (rolls[i][col - 1]) * (HMMParams[i, row]) * (emissionStates[c][row]);
+              double stateValues = (rolls[i][col - 1].value) * (HMMParams[i, row]) * (emissionStates[c][row]);
               //double stateValues = Math.Log(rolls[i][col - 1]) + Math.Log(HMMParams[i, col]) + Math.Log(emissionStates[c][col]);
-              rolls[row][col] = Math.Max(rolls[row][col], stateValues);
+              rolls[row][col].value = Math.Max(rolls[row][col].value, stateValues);
+              rolls[row][col].allStates[i] = stateValues;
             }
           }
           maxLenInRolls = Math.Max(maxLenInRolls, rolls[row][col].ToString().Length);
@@ -82,13 +84,12 @@ namespace Assignment4
       int prevState = -1;
       for (int j = sequences.Length - 1; j >= 0; j--) {
         if (j == sequences.Length - 1) {
-          prevState = (rolls[state1][j] > rolls[state2][j])  ? state1 : state2; 
+          prevState = (rolls[state1][j].value > rolls[state2][j].value)  ? state1 : state2; 
         } else {
           int k = j + 1;
           char c = validateSequenceChar(sequences[k]);
-          double state21 = rolls[state2][k-1] * HMMParams[state2,state1] * emissionStates[c][state1];
-          double state22 = rolls[state2][k-1] * HMMParams[state2,state2] * emissionStates[c][state2];
-          prevState = ((prevState == state2 && rolls[state2][k] == state22) || (prevState == state1 && rolls[state1][k] == state21)) ? state2  : state1;
+          prevState = ((prevState == state2 && rolls[state2][k].value == rolls[state2][k].allStates[state2]) || 
+                       (prevState == state1 && rolls[state1][k].value == rolls[state1][k].allStates[state2])) ? state2  : state1;
         }
         mostProbablePath.Append(prevState.ToString());
         // mostProbablePath.Append(prevState == state1 ? "L" : "F");
@@ -144,11 +145,15 @@ namespace Assignment4
     }
 
     public static void initializeTestTransitionAndEmissionStates() {
-
+      //HMMParams = new double[numStates + 1, numStates] {
+      //   {0.9, 0.10}, // {0.6, 0.40},
+      //   {0.05, 0.95}, //  {0.17, 0.83},
+      //   {0.52, 0.48} //begin
+      //};
 
       HMMParams = new double[numStates + 1, numStates] {
-         {0.9, 0.10}, // {0.6, 0.40},
-         {0.05, 0.95}, //  {0.17, 0.83},
+         {0.6, 0.40},
+         {0.17, 0.83},
          {0.52, 0.48} //begin
       };
 
@@ -160,11 +165,11 @@ namespace Assignment4
       emissionStates.Add('6', new double[numStates] { 1.0 / 2, 1.0 / 6 });
     }
 
-    public static void print(double[][] a) {      
+    public static void print(StateEstimation[][] a) {      
       for (int i = 0; i < a.Length; i++) {
         StringBuilder s = new StringBuilder(addTrailiingWhiteSpaces(i.ToString(), 1));
         for (int j =0; j < a[0].Length; j++) {
-          string rollProbStr = a[i][j].ToString();
+          string rollProbStr = a[i][j].value.ToString();
           s.Append(addTrailiingWhiteSpaces(rollProbStr, maxLenInRolls - rollProbStr.Length));
         }
         Console.WriteLine(s.ToString());
