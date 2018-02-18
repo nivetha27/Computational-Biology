@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace Assignment4
 {
-  public class stateEstimation {
+  public class StateEstimation {
     public double value;
     public double[] allStates;
 
-    public stateEstimation(int numStates) {
+    public StateEstimation(int numStates) {
       value = 0;
       allStates = new double[numStates];
     }
@@ -23,16 +23,17 @@ namespace Assignment4
     public const int numStates = 2;
     public const int state1 = 0;
     public const int state2 = 1;
-    // public static string sequences = "315116246446644245311321631164152133625144543631656626566666651166453132651245636664631636663162326455236266666625151631222555441666566563564324364131513465146353411126414626253356366163666466232534413661661163252562462255265252266435353336233121625364414432335163243633665562466662632666612355245242";
-    public static string sequences = "316664";
+    public static string sequences = "315116246446644245311321631164152133625144543631656626566666651166453132651245636664631636663162326455236266666625151631222555441666566563564324364131513465146353411126414626253356366163666466232534413661661163252562462255265252266435353336233121625364414432335163243633665562466662632666612355245242";
+    // public static string sequences = "316664";
     public static double[,] HMMParams;
     public static Dictionary<char, double[]> emissionStates = new Dictionary<char, double[]>();
     public static int maxLenInRolls = Int32.MinValue;
     public static double[][] rolls = new double[numStates][];
     static void Main(string[] args)
     {
-      initializeTransitionAndEmissionStates();
-      sequences = readAFastaFile(@"C:\Users\nsathya\Documents\GitHub\Computational-Biology\Assignment4\Assignment4\GCF_000091665.1_ASM9166v1_genomic.fna");
+      initializeTestTransitionAndEmissionStates();
+      // initializeTransitionAndEmissionStates();
+      // sequences = readAFastaFile(@"C:\Users\nsathya\Documents\GitHub\Computational-Biology\Assignment4\Assignment4\GCF_000091665.1_ASM9166v1_genomic.fna");
       // Console.WriteLine(sequences);
 
       initializeTransitionEmissionArray();
@@ -58,66 +59,47 @@ namespace Assignment4
       for (int i = 0; i < numStates; i++)
         rolls[i] = new double[sequences.Length];
 
-      for (int j = 0; j < sequences.Length; j++) {
-        char c = validateSequenceChar(sequences[j]);
-        if (j == 0) {
-          rolls[state1][j] = Math.Log(HMMParams[numStates, state1]) + Math.Log(emissionStates[c][state1]);
-          rolls[state2][j] = Math.Log(HMMParams[numStates, state2]) + Math.Log(emissionStates[c][state2]);
-          //rolls[state1][j] = (HMMParams[numStates, state1]) * (emissionStates[c][state1]);
-          //rolls[state2][j] = (HMMParams[numStates, state2]) * (emissionStates[c][state2]);
-        } else {
-          double state11 = Math.Log(rolls[state1][j - 1]) + Math.Log(HMMParams[state1, state1]) + Math.Log(emissionStates[c][state1]);
-          double state21 = Math.Log(rolls[state2][j - 1]) + Math.Log(HMMParams[state2, state1]) + Math.Log(emissionStates[c][state1]);
-          rolls[state1][j] = Math.Max(state11, state21);
-          double state12 = Math.Log(rolls[state1][j - 1]) + Math.Log(HMMParams[state1, state2]) + Math.Log(emissionStates[c][state2]);
-          double state22 = Math.Log(rolls[state2][j - 1]) + Math.Log(HMMParams[state2, state2]) + Math.Log(emissionStates[c][state2]);
-          rolls[state2][j] = Math.Max(state12, state22);
-          //double state11 = (rolls[state1][j - 1]) * (HMMParams[state1, state1]) * (emissionStates[c][state1]);
-          //double state21 = (rolls[state2][j - 1]) * (HMMParams[state2, state1]) * (emissionStates[c][state1]);
-          //rolls[state1][j] = Math.Max(state11, state21);
-          //double state12 = (rolls[state1][j - 1]) * (HMMParams[state1, state2]) * (emissionStates[c][state2]);
-          //double state22 = (rolls[state2][j - 1]) * (HMMParams[state2, state2]) * (emissionStates[c][state2]);
-          //rolls[state2][j] = Math.Max(state12, state22);
+      for (int col = 0; col < sequences.Length; col++) {
+        for (int row = 0; row < numStates; row++) {
+          char c = validateSequenceChar(sequences[col]);
+          if (col == 0) {
+            rolls[row][col] = (HMMParams[numStates, row]) * (emissionStates[c][row]);
+            // rolls[row][col] = Math.Log(HMMParams[numStates, row]) + Math.Log(emissionStates[c][row]);
+          } else {
+            rolls[row][col] = Double.MinValue;
+            for (int i = 0; i < numStates; i++) {
+              double stateValues = (rolls[i][col - 1]) * (HMMParams[i, row]) * (emissionStates[c][row]);
+              //double stateValues = Math.Log(rolls[i][col - 1]) + Math.Log(HMMParams[i, col]) + Math.Log(emissionStates[c][col]);
+              rolls[row][col] = Math.Max(rolls[row][col], stateValues);
+            }
+          }
+          maxLenInRolls = Math.Max(maxLenInRolls, rolls[row][col].ToString().Length);
         }
-
-        maxLenInRolls = Math.Max(maxLenInRolls, Math.Max(rolls[state1][j].ToString().Length,rolls[state2][j].ToString().Length));
       }
     }
-
     public static void traceBack() {
       StringBuilder mostProbablePath = new StringBuilder();
       int prevState = -1;
       for (int j = sequences.Length - 1; j >= 0; j--) {
         if (j == sequences.Length - 1) {
-          if (rolls[state1][j] > rolls[state2][j]) {
-            prevState = state1;
-          } else {
-            // mostProbablePath.Append("F"); 
-            prevState = state2;
-          } 
+          prevState = (rolls[state1][j] > rolls[state2][j])  ? state1 : state2; 
         } else {
           int k = j + 1;
-          char c = validateSequenceChar(sequences[j]);
-          double state21 = Math.Log(rolls[state2][k - 1]) + Math.Log(HMMParams[state2, state1]) + Math.Log(emissionStates[c][state1]);
-          double state22 = Math.Log(rolls[state2][k - 1]) + Math.Log(HMMParams[state2, state2]) + Math.Log(emissionStates[c][state2]);
-          //double state21 = (rolls[state2][k - 1]) * (HMMParams[state2, state1]) * (emissionStates[c][state1]);
-          //double state22 = (rolls[state2][k - 1]) * (HMMParams[state2, state2]) * (emissionStates[c][state2]);
-          if ((prevState == state2 && rolls[state2][k] == state22) || (prevState == state1 && rolls[state1][k] == state21)) {
-            // mostProbablePath.Append("F");
-            prevState = state2;
-          } else {
-            // mostProbablePath.Append("L");
-            prevState = state1;
-          }
+          char c = validateSequenceChar(sequences[k]);
+          double state21 = rolls[state2][k-1] * HMMParams[state2,state1] * emissionStates[c][state1];
+          double state22 = rolls[state2][k-1] * HMMParams[state2,state2] * emissionStates[c][state2];
+          prevState = ((prevState == state2 && rolls[state2][k] == state22) || (prevState == state1 && rolls[state1][k] == state21)) ? state2  : state1;
         }
         mostProbablePath.Append(prevState.ToString());
+        // mostProbablePath.Append(prevState == state1 ? "L" : "F");
       }
       string viterbi = reverse(mostProbablePath.ToString());
-      Console.WriteLine(String.Format("Viterbi path is: {0}", viterbi));
-      
+      // Console.WriteLine(String.Format("Viterbi path is: {0}", viterbi));
       for (int i = 0; i < sequences.Length;) {
-        string prefixFirst = String.Format("Rolls    ");
-        string prefixSecond = String.Format("Viterbi  ");
+        string prefixFirst = "Rolls";
+        string prefixSecond = "Viterbi";
+        prefixFirst = addTrailiingWhiteSpaces(prefixFirst, 9 - prefixFirst.Length);
+        prefixSecond = addTrailiingWhiteSpaces(prefixSecond, 9 - prefixSecond.Length);
 
         Console.WriteLine(prefixFirst + " " + safeSubstring(sequences, i, numCharsToPrintPerLine));
         Console.WriteLine(prefixSecond + " " + safeSubstring(viterbi, i, numCharsToPrintPerLine));
@@ -165,8 +147,8 @@ namespace Assignment4
 
 
       HMMParams = new double[numStates + 1, numStates] {
-         /*{0.9, 0.10},*/ {0.6, 0.40},
-         /*{0.05, 0.95},*/  {0.17, 0.83},
+         {0.9, 0.10}, // {0.6, 0.40},
+         {0.05, 0.95}, //  {0.17, 0.83},
          {0.52, 0.48} //begin
       };
 
