@@ -44,7 +44,7 @@ namespace Assignment4
     public static StateEstimation[][] HMM = new StateEstimation[numStates][];
     static void Main(string[] args)
     {
-      bool runTestData = true;
+      bool runTestData = false;
       if (runTestData) {
         initializeTestTransitionAndEmissionStates(toyExample: true);
       } else {
@@ -189,9 +189,10 @@ namespace Assignment4
           int prevState = (int)Char.GetNumericValue(viterbi[i-1]);
           newTransitionStates[prevState, curState] += 1;        
         }
-        // this is not considering char other than ACGT, VERIFY IF THIS ID RIGHT.
-        if (newEmissionStates.ContainsKey(sequences[i])) {
-          newEmissionStates[sequences[i]][curState] += 1;
+        
+        char x = validateSequenceChar(sequences[i]);
+        if (newEmissionStates.ContainsKey(x)) {
+          newEmissionStates[x][curState] += 1;
           newEmissionStatesOverallCount[curState] += 1;
         }
       }
