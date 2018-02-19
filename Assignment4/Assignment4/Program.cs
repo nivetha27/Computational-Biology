@@ -40,16 +40,18 @@ namespace Assignment4
     public static StateEstimation[][] HMM = new StateEstimation[numStates][];
     static void Main(string[] args)
     {
-      bool runTestData = true;
+      bool runTestData = false;
       if (runTestData) {
-        initializeTestTransitionAndEmissionStates(false);
+        initializeTestTransitionAndEmissionStates(true);
       } else {
         initializeTransitionAndEmissionStates();
         sequences = readAFastaFile(fileDirectory + "GCF_000091665.1_ASM9166v1_genomic.fna");
         // Console.WriteLine(sequences);
       }
       computeHMMForward();
-      traceBack();
+      string viterbi = traceBack();
+      calculateHits(viterbi);
+      trainData(viterbi);
       // print(HMM);
 
       Console.WriteLine("Press any key to exit.....");
@@ -85,13 +87,10 @@ namespace Assignment4
     /// <summary>
     /// This function traces back and determines
     /// 1. Viterbi path and prints it
-    /// 2. #Hits (sequences of 1) and prints the location and length.
+    /// 2. Prints the overall log probability
     /// </summary>
-    public static void traceBack(int numHitsToPrnt = Int32.MaxValue, bool shouldPrintViterbi = true) {
-      bool curState1SeqFound = false;
+    public static string traceBack(bool shouldPrintViterbi = true) {
       StringBuilder mostProbablePath = new StringBuilder();
-      List<Coordinates> hits = new List<Coordinates>();
-      Coordinates x = new Coordinates();
       int prevState = -1;
       for (int j = sequences.Length - 1; j >= 0; j--) {
         if (j == sequences.Length - 1) {
@@ -105,9 +104,22 @@ namespace Assignment4
         }
         mostProbablePath.Append(prevState.ToString());
         // mostProbablePath.Append(prevState == state0 ? "L" : "F");
+      }
 
-        // calculate hits
-        if (prevState == state1) {
+      string viterbi = reverse(mostProbablePath.ToString());
+      if (shouldPrintViterbi)
+        printViterbiPath(viterbi);
+      
+      return viterbi;
+    }
+
+    public static void calculateHits(string viterbi, int k = Int32.MaxValue) {
+      bool curState1SeqFound = false;
+      List<Coordinates> hits = new List<Coordinates>();
+      Coordinates x = new Coordinates();
+      for (int j = viterbi.Length - 1; j >= 0 ; j--) {
+        int curState = (int)Char.GetNumericValue(viterbi[j]);
+        if (curState == state1) {
           if (!curState1SeqFound) {
             x = new Coordinates(j + 1,j + 1);
             curState1SeqFound = true;
@@ -117,18 +129,22 @@ namespace Assignment4
           if (j == 0) { // edge case if the first element is state1
             hits.Add(x);
           }
-        } else if (prevState == state0) {
+        } else if (curState == state0) {
           if (curState1SeqFound) {
             hits.Add(x);
           }
           curState1SeqFound = false;
         }
       }
-
-      printHits(hits, numHitsToPrnt);
-      if (shouldPrintViterbi)
-        printViterbiPath(reverse(mostProbablePath.ToString()));
+      printHits(hits, k);
     }
+
+    public static void trainData(string viterbi) {
+      for (int i = 0; i < viterbi.Length; i++) {
+      
+      }
+    }
+
     public static void initializeTransitionAndEmissionStates() {
       transitionStates = new double[numStates + 1, numStates] {
       // {state 1, State 2}
