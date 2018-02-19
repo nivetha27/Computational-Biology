@@ -46,7 +46,7 @@ namespace Assignment4
     {
       bool runTestData = false;
       if (runTestData) {
-        initializeTestTransitionAndEmissionStates(toyExample: true);
+        initializeTestTransitionAndEmissionStates(toyExample: false);
       } else {
         initializeTransitionAndEmissionStates();
         sequences = readAFastaFile(fileDirectory + "GCF_000091665.1_ASM9166v1_genomic.fna");
@@ -149,16 +149,16 @@ namespace Assignment4
       bool curState1SeqFound = false;
       List<Coordinates> hits = new List<Coordinates>();
       Coordinates x = new Coordinates();
-      for (int j = viterbi.Length - 1; j >= 0 ; j--) {
+      for (int j = 0; j < viterbi.Length ; j++) {
         int curState = (int)Char.GetNumericValue(viterbi[j]);
         if (curState == state1) {
           if (!curState1SeqFound) {
             x = new Coordinates(j + 1,j + 1);
             curState1SeqFound = true;
           } else {
-            x.start = j + 1;
+            x.end = j + 1;
           }
-          if (j == 0) { // edge case if the first element is state1
+          if (j == viterbi.Length - 1) { // edge case if the first element is state1
             hits.Add(x);
           }
         } else if (curState == state0) {
