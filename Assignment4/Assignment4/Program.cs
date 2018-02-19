@@ -61,9 +61,9 @@ namespace Assignment4
         string viterbi = traceBack();
         int viterbiLastIdx = viterbi.Length - 1;
         curMaxLogProb = HMM[(int)Char.GetNumericValue(viterbi[viterbiLastIdx])][viterbiLastIdx].value;
-        Console.WriteLine(String.Format("Overall log probability {0}", curMaxLogProb));
-        sw.WriteLine(String.Format("Overall log probability {0}", curMaxLogProb));
+        printToConsoleAndWriteToFile(String.Format("Overall log probability {0}", curMaxLogProb));
         calculateHits(viterbi);
+        printViterbiPath(viterbi);
         trainData(viterbi);
         // print(HMM);
       } while (Math.Abs(curMaxLogProb - prevMaxLogProb) > epsilon);
@@ -121,10 +121,7 @@ namespace Assignment4
         // mostProbablePath.Append(prevState == state0 ? "L" : "F");
       }
 
-      string viterbi = reverse(mostProbablePath.ToString());
-      printViterbiPath(viterbi);
-      
-      return viterbi;
+      return reverse(mostProbablePath.ToString());
     }
 
     public static void calculateHits(string viterbi, int k = Int32.MaxValue) {
@@ -237,50 +234,51 @@ namespace Assignment4
     }
 
     /*************************************************************************PRINT FUNCTIONS**********************************************************************************************************/
-    public static void printTransitionAndEmissionProb() {
-      sw.WriteLine("Transition States Probabilities");
-      Console.WriteLine("Transition States Probabilities");
-      sw.Write(addTrailiingWhiteSpaces(" ", 10 - 1));
-      Console.Write(addTrailiingWhiteSpaces(" ", 10 - 1));
-      for (int i = 0; i < numStates; i++) {
-        string curState = "state" + (i+1).ToString();
-        Console.Write(addTrailiingWhiteSpaces(curState, maxLenInRolls - curState.Length));
-        sw.Write(addTrailiingWhiteSpaces(curState, maxLenInRolls - curState.Length));
-      }
-      Console.WriteLine();
-      sw.WriteLine();
-      for (int i = 0; i < transitionStates.GetLength(0); i++) {
-        string curState = i == transitionStates.GetLength(0) - 1 ? "begin" : "state" + (i+1).ToString();
-        sw.Write(addTrailiingWhiteSpaces(curState, 10 - curState.Length));
-        Console.Write(addTrailiingWhiteSpaces(curState, 10 - curState.Length));
-        for (int j = 0; j < transitionStates.GetLength(1); j++) {
-          sw.Write(addTrailiingWhiteSpaces(transitionStates[i,j].ToString(), maxLenInRolls - transitionStates[i,j].ToString().Length));
-          Console.Write(addTrailiingWhiteSpaces(transitionStates[i,j].ToString(), maxLenInRolls - transitionStates[i,j].ToString().Length));
+    public static void printToConsoleAndWriteToFile(string s, bool writeInNewline = true, bool writeToConsole = true) {
+      if (String.IsNullOrEmpty(s)) {
+        if (writeInNewline) {
+          s = Environment.NewLine;
         }
-        sw.WriteLine();
-        Console.WriteLine();
+      } else if (writeInNewline) {
+        s = s + Environment.NewLine;
       }
 
-      sw.WriteLine("Emission States Probabilities");
-      Console.WriteLine("Emission States Probabilities");
-      sw.Write(addTrailiingWhiteSpaces(" ", 4));
-      Console.Write(addTrailiingWhiteSpaces(" ", 4));
+      if (writeToConsole) {
+        Console.Write(s);
+      }
+      sw.Write(s);
+    }
+    
+    public static void printTransitionAndEmissionProb() {
+      printToConsoleAndWriteToFile("Transition States Probabilities");
+      printToConsoleAndWriteToFile(addTrailiingWhiteSpaces(" ", 10 - 1), false);
       for (int i = 0; i < numStates; i++) {
         string curState = "state" + (i+1).ToString();
-        sw.Write(addTrailiingWhiteSpaces(curState, maxLenInRolls - curState.Length));
-        Console.Write(addTrailiingWhiteSpaces(curState, maxLenInRolls - curState.Length));
+        printToConsoleAndWriteToFile(addTrailiingWhiteSpaces(curState, maxLenInRolls - curState.Length), false);
       }
-      sw.WriteLine();
-      Console.WriteLine();
-      foreach(var emissionState in emissionStates) {
-        sw.Write(addTrailiingWhiteSpaces(emissionState.Key.ToString(), 4));
-        Console.Write(addTrailiingWhiteSpaces(emissionState.Key.ToString(), 4));
-        for (int j = 0; j < emissionState.Value.Length; j++) {
-          sw.Write(addTrailiingWhiteSpaces(emissionState.Value[j].ToString(), maxLenInRolls - emissionState.Value[j].ToString().Length));
-          Console.Write(addTrailiingWhiteSpaces(emissionState.Value[j].ToString(), maxLenInRolls - emissionState.Value[j].ToString().Length));
+      printToConsoleAndWriteToFile(null);
+      for (int i = 0; i < transitionStates.GetLength(0); i++) {
+        string curState = i == transitionStates.GetLength(0) - 1 ? "begin" : "state" + (i+1).ToString();
+        printToConsoleAndWriteToFile(addTrailiingWhiteSpaces(curState, 10 - curState.Length), false);
+        for (int j = 0; j < transitionStates.GetLength(1); j++) {
+          printToConsoleAndWriteToFile(addTrailiingWhiteSpaces(transitionStates[i,j].ToString(), maxLenInRolls - transitionStates[i,j].ToString().Length), false);
         }
-        sw.WriteLine();
-        Console.WriteLine();
+        printToConsoleAndWriteToFile(null);
+      }
+
+      printToConsoleAndWriteToFile("Emission States Probabilities");
+      printToConsoleAndWriteToFile(addTrailiingWhiteSpaces(" ", 4), false);
+      for (int i = 0; i < numStates; i++) {
+        string curState = "state" + (i+1).ToString();
+        printToConsoleAndWriteToFile(addTrailiingWhiteSpaces(curState, maxLenInRolls - curState.Length), false);
+      }
+      printToConsoleAndWriteToFile(null);
+      foreach(var emissionState in emissionStates) {
+        printToConsoleAndWriteToFile(addTrailiingWhiteSpaces(emissionState.Key.ToString(), 4), false);
+        for (int j = 0; j < emissionState.Value.Length; j++) {
+          printToConsoleAndWriteToFile(addTrailiingWhiteSpaces(emissionState.Value[j].ToString(), maxLenInRolls - emissionState.Value[j].ToString().Length), false);
+        }
+        printToConsoleAndWriteToFile(null);
       }
     }
     
@@ -291,13 +289,11 @@ namespace Assignment4
           string rollProbStr = a[i][j].value.ToString();
           s.Append(addTrailiingWhiteSpaces(rollProbStr, maxLenInRolls - rollProbStr.Length));
         }
-        sw.WriteLine(s.ToString());
-        Console.WriteLine(s.ToString());
+        printToConsoleAndWriteToFile(s.ToString());
       }
     }
 
     public static void printViterbiPath(string viterbi) {
-      // Console.WriteLine(String.Format("Viterbi path is: {0}", viterbi));
       for (int i = 0; i < sequences.Length;)
       {
         string prefixFirst = "Rolls";
@@ -305,29 +301,22 @@ namespace Assignment4
         prefixFirst = addTrailiingWhiteSpaces(prefixFirst, 9 - prefixFirst.Length);
         prefixSecond = addTrailiingWhiteSpaces(prefixSecond, 9 - prefixSecond.Length);
 
-        //Console.WriteLine(prefixFirst + " " + safeSubstring(sequences, i, numCharsToPrintPerLine));
-        //Console.WriteLine(prefixSecond + " " + safeSubstring(viterbi, i, numCharsToPrintPerLine));
-        //Console.WriteLine();
-
-        sw.WriteLine(prefixFirst + " " + safeSubstring(sequences, i, numCharsToPrintPerLine));
-        sw.WriteLine(prefixSecond + " " + safeSubstring(viterbi, i, numCharsToPrintPerLine));
-        sw.WriteLine();
+        printToConsoleAndWriteToFile(prefixFirst + " " + safeSubstring(sequences, i, numCharsToPrintPerLine), true, false);
+        printToConsoleAndWriteToFile(prefixSecond + " " + safeSubstring(viterbi, i, numCharsToPrintPerLine), true, false);
+        printToConsoleAndWriteToFile(null, true, false);
         i += numCharsToPrintPerLine;
       }
     }
 
     public static void printHits(List<Coordinates> hits, int numHitsToPrnt = Int32.MaxValue) {
-      sw.WriteLine(String.Format("#hits : {0}", hits.Count()));
-      Console.WriteLine(String.Format("#hits : {0}", hits.Count()));
+      printToConsoleAndWriteToFile(String.Format("#hits : {0}", hits.Count()));
 
       if (numHitsToPrnt > hits.Count()) {
         numHitsToPrnt = hits.Count();
       }
-      sw.WriteLine(String.Format("Printing {0} / {1} hits", numHitsToPrnt, hits.Count()));
-      Console.WriteLine(String.Format("Printing {0} / {1} hits", numHitsToPrnt, hits.Count()));
+      printToConsoleAndWriteToFile(String.Format("Printing {0} / {1} hits", numHitsToPrnt, hits.Count()));
       for (int i = 0; i < numHitsToPrnt; i++) {
-        sw.WriteLine(String.Format("Location = {0}, Length = {1}", hits[i].start, hits[i].end - hits[i].start + 1));
-        Console.WriteLine(String.Format("Location = {0}, Length = {1}", hits[i].start, hits[i].end - hits[i].start + 1));
+        printToConsoleAndWriteToFile(String.Format("Location = {0}, Length = {1}", hits[i].start, hits[i].end - hits[i].start + 1));
       }
     }
 
