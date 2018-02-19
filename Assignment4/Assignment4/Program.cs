@@ -28,6 +28,7 @@ namespace Assignment4
   class Program
   {
     public const double epsilon = 0.001;
+    public const int maxiteration = 10;
     public const int numCharsToPrintPerLine = 60;
     public const int numStates = 2;
     public const int state0 = 0;
@@ -45,13 +46,38 @@ namespace Assignment4
     {
       bool runTestData = true;
       if (runTestData) {
-        initializeTestTransitionAndEmissionStates(toyExample: false);
+        initializeTestTransitionAndEmissionStates(toyExample: true);
       } else {
         initializeTransitionAndEmissionStates();
         sequences = readAFastaFile(fileDirectory + "GCF_000091665.1_ASM9166v1_genomic.fna");
         // Console.WriteLine(sequences);
       }
+      // EMWithEpsilon();
+      EMWithMaxIterations();      
 
+      sw.Flush();
+      sw.Close();
+      Console.WriteLine("Press any key to exit.....");
+      Console.ReadLine();
+    }
+
+    public static void EMWithMaxIterations() {
+      for (int i = 1; i <= maxiteration; i++) {
+        computeHMMForward();
+        printTransitionAndEmissionProb();        
+        string viterbi = traceBack();
+        int viterbiLastIdx = viterbi.Length - 1;
+        double curMaxLogProb = HMM[(int)Char.GetNumericValue(viterbi[viterbiLastIdx])][viterbiLastIdx].value;
+        printToConsoleAndWriteToFile(String.Format("Overall log probability {0}", curMaxLogProb));
+        int x = i < maxiteration ? maxiteration/2 : Int32.MaxValue;
+        calculateHits(viterbi,x);
+        printViterbiPath(viterbi);
+        trainData(viterbi);
+        // print(HMM);
+      }
+    }
+
+    public static void EMWithEpsilon() {
       double curMaxLogProb = 0.0, prevMaxLogProb = 0.0;
       do {
         prevMaxLogProb = curMaxLogProb;
@@ -66,12 +92,7 @@ namespace Assignment4
         printViterbiPath(viterbi);
         trainData(viterbi);
         // print(HMM);
-      } while (Math.Abs(curMaxLogProb - prevMaxLogProb) > epsilon);
-
-      sw.Flush();
-      sw.Close();
-      Console.WriteLine("Press any key to exit.....");
-      Console.ReadLine();
+      } while(Math.Abs(curMaxLogProb - prevMaxLogProb) > epsilon);
     }
 
     public static void computeHMMForward() {
