@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -34,6 +34,8 @@ namespace Assignment4
     public const int state1 = 1;
     public const char defaultCharReplaceNonACGT = 'T';
     public static string fileDirectory = @"C:\Users\nsathya\Documents\GitHub\Computational-Biology\Assignment4\Assignment4\";
+    public static string outputFullFileName = fileDirectory + "output" + DateTime.Now.Ticks + ".txt";
+    public static StreamWriter sw = new StreamWriter(outputFullFileName, append: true);
     public static string sequences = "316664";
     public static double[,] transitionStates;
     public static Dictionary<char, double[]> emissionStates = new Dictionary<char, double[]>();
@@ -41,9 +43,9 @@ namespace Assignment4
     public static StateEstimation[][] HMM = new StateEstimation[numStates][];
     static void Main(string[] args)
     {
-      bool runTestData = false;
+      bool runTestData = true;
       if (runTestData) {
-        initializeTestTransitionAndEmissionStates(false);
+        initializeTestTransitionAndEmissionStates(toyExample: false);
       } else {
         initializeTransitionAndEmissionStates();
         sequences = readAFastaFile(fileDirectory + "GCF_000091665.1_ASM9166v1_genomic.fna");
@@ -55,16 +57,19 @@ namespace Assignment4
         prevMaxLogProb = curMaxLogProb;
         computeHMMForward();
         printTransitionAndEmissionProb();
-        string outputFullFileName = fileDirectory + "output" + DateTime.Now.Ticks + ".txt";
-        string viterbi = traceBack(outputFullFileName);
+        
+        string viterbi = traceBack();
         int viterbiLastIdx = viterbi.Length - 1;
         curMaxLogProb = HMM[(int)Char.GetNumericValue(viterbi[viterbiLastIdx])][viterbiLastIdx].value;
         Console.WriteLine(String.Format("Overall log probability {0}", curMaxLogProb));
+        sw.WriteLine(String.Format("Overall log probability {0}", curMaxLogProb));
         calculateHits(viterbi);
         trainData(viterbi);
         // print(HMM);
       } while (Math.Abs(curMaxLogProb - prevMaxLogProb) > epsilon);
 
+      sw.Flush();
+      sw.Close();
       Console.WriteLine("Press any key to exit.....");
       Console.ReadLine();
     }
@@ -100,7 +105,7 @@ namespace Assignment4
     /// 1. Viterbi path and prints it
     /// 2. Prints the overall log probability
     /// </summary>
-    public static string traceBack(string viterbiOutputFile = null) {
+    public static string traceBack() {
       StringBuilder mostProbablePath = new StringBuilder();
       int prevState = -1;
       for (int j = sequences.Length - 1; j >= 0; j--) {
@@ -117,8 +122,7 @@ namespace Assignment4
       }
 
       string viterbi = reverse(mostProbablePath.ToString());
-      if (!String.IsNullOrEmpty(viterbiOutputFile))
-        printViterbiPath(viterbi, viterbiOutputFile);
+      printViterbiPath(viterbi);
       
       return viterbi;
     }
@@ -234,34 +238,48 @@ namespace Assignment4
 
     /*************************************************************************PRINT FUNCTIONS**********************************************************************************************************/
     public static void printTransitionAndEmissionProb() {
+      sw.WriteLine("Transition States Probabilities");
       Console.WriteLine("Transition States Probabilities");
+      sw.Write(addTrailiingWhiteSpaces(" ", 10 - 1));
       Console.Write(addTrailiingWhiteSpaces(" ", 10 - 1));
       for (int i = 0; i < numStates; i++) {
         string curState = "state" + (i+1).ToString();
-        Console.Write(addTrailiingWhiteSpaces(curState, 10 - curState.Length));
+        Console.Write(addTrailiingWhiteSpaces(curState, maxLenInRolls - curState.Length));
+        sw.Write(addTrailiingWhiteSpaces(curState, maxLenInRolls - curState.Length));
       }
       Console.WriteLine();
+      sw.WriteLine();
       for (int i = 0; i < transitionStates.GetLength(0); i++) {
         string curState = i == transitionStates.GetLength(0) - 1 ? "begin" : "state" + (i+1).ToString();
+        sw.Write(addTrailiingWhiteSpaces(curState, 10 - curState.Length));
         Console.Write(addTrailiingWhiteSpaces(curState, 10 - curState.Length));
         for (int j = 0; j < transitionStates.GetLength(1); j++) {
+          sw.Write(addTrailiingWhiteSpaces(transitionStates[i,j].ToString(), maxLenInRolls - transitionStates[i,j].ToString().Length));
           Console.Write(addTrailiingWhiteSpaces(transitionStates[i,j].ToString(), maxLenInRolls - transitionStates[i,j].ToString().Length));
         }
+        sw.WriteLine();
         Console.WriteLine();
       }
 
+      sw.WriteLine("Emission States Probabilities");
       Console.WriteLine("Emission States Probabilities");
+      sw.Write(addTrailiingWhiteSpaces(" ", 4));
       Console.Write(addTrailiingWhiteSpaces(" ", 4));
       for (int i = 0; i < numStates; i++) {
         string curState = "state" + (i+1).ToString();
+        sw.Write(addTrailiingWhiteSpaces(curState, maxLenInRolls - curState.Length));
         Console.Write(addTrailiingWhiteSpaces(curState, maxLenInRolls - curState.Length));
       }
+      sw.WriteLine();
       Console.WriteLine();
       foreach(var emissionState in emissionStates) {
+        sw.Write(addTrailiingWhiteSpaces(emissionState.Key.ToString(), 4));
         Console.Write(addTrailiingWhiteSpaces(emissionState.Key.ToString(), 4));
         for (int j = 0; j < emissionState.Value.Length; j++) {
+          sw.Write(addTrailiingWhiteSpaces(emissionState.Value[j].ToString(), maxLenInRolls - emissionState.Value[j].ToString().Length));
           Console.Write(addTrailiingWhiteSpaces(emissionState.Value[j].ToString(), maxLenInRolls - emissionState.Value[j].ToString().Length));
         }
+        sw.WriteLine();
         Console.WriteLine();
       }
     }
@@ -273,40 +291,42 @@ namespace Assignment4
           string rollProbStr = a[i][j].value.ToString();
           s.Append(addTrailiingWhiteSpaces(rollProbStr, maxLenInRolls - rollProbStr.Length));
         }
+        sw.WriteLine(s.ToString());
         Console.WriteLine(s.ToString());
       }
     }
 
-    public static void printViterbiPath(string viterbi, string outputFilePath) {
+    public static void printViterbiPath(string viterbi) {
       // Console.WriteLine(String.Format("Viterbi path is: {0}", viterbi));
-      using (StreamWriter sw = new StreamWriter(outputFilePath)) {
-        for (int i = 0; i < sequences.Length;)
-        {
-          string prefixFirst = "Rolls";
-          string prefixSecond = "Viterbi";
-          prefixFirst = addTrailiingWhiteSpaces(prefixFirst, 9 - prefixFirst.Length);
-          prefixSecond = addTrailiingWhiteSpaces(prefixSecond, 9 - prefixSecond.Length);
+      for (int i = 0; i < sequences.Length;)
+      {
+        string prefixFirst = "Rolls";
+        string prefixSecond = "Viterbi";
+        prefixFirst = addTrailiingWhiteSpaces(prefixFirst, 9 - prefixFirst.Length);
+        prefixSecond = addTrailiingWhiteSpaces(prefixSecond, 9 - prefixSecond.Length);
 
-          //Console.WriteLine(prefixFirst + " " + safeSubstring(sequences, i, numCharsToPrintPerLine));
-          //Console.WriteLine(prefixSecond + " " + safeSubstring(viterbi, i, numCharsToPrintPerLine));
-          //Console.WriteLine();
+        //Console.WriteLine(prefixFirst + " " + safeSubstring(sequences, i, numCharsToPrintPerLine));
+        //Console.WriteLine(prefixSecond + " " + safeSubstring(viterbi, i, numCharsToPrintPerLine));
+        //Console.WriteLine();
 
-          sw.WriteLine(prefixFirst + " " + safeSubstring(sequences, i, numCharsToPrintPerLine));
-          sw.WriteLine(prefixSecond + " " + safeSubstring(viterbi, i, numCharsToPrintPerLine));
-          sw.WriteLine();
-          i += numCharsToPrintPerLine;
-        }
+        sw.WriteLine(prefixFirst + " " + safeSubstring(sequences, i, numCharsToPrintPerLine));
+        sw.WriteLine(prefixSecond + " " + safeSubstring(viterbi, i, numCharsToPrintPerLine));
+        sw.WriteLine();
+        i += numCharsToPrintPerLine;
       }
     }
 
     public static void printHits(List<Coordinates> hits, int numHitsToPrnt = Int32.MaxValue) {
+      sw.WriteLine(String.Format("#hits : {0}", hits.Count()));
       Console.WriteLine(String.Format("#hits : {0}", hits.Count()));
 
       if (numHitsToPrnt > hits.Count()) {
         numHitsToPrnt = hits.Count();
       }
+      sw.WriteLine(String.Format("Printing {0} / {1} hits", numHitsToPrnt, hits.Count()));
       Console.WriteLine(String.Format("Printing {0} / {1} hits", numHitsToPrnt, hits.Count()));
       for (int i = 0; i < numHitsToPrnt; i++) {
+        sw.WriteLine(String.Format("Location = {0}, Length = {1}", hits[i].start, hits[i].end - hits[i].start + 1));
         Console.WriteLine(String.Format("Location = {0}, Length = {1}", hits[i].start, hits[i].end - hits[i].start + 1));
       }
     }
