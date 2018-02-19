@@ -33,25 +33,27 @@ namespace Assignment4
     public const int state1 = 1;
     public const char defaultCharReplaceNonACGT = 'T';
     public static string fileDirectory = @"C:\Users\nsathya\Documents\GitHub\Computational-Biology\Assignment4\Assignment4\";
-    // public static string sequences = "315116246446644245311321631164152133625144543631656626566666651166453132651245636664631636663162326455236266666625151631222555441666566563564324364131513465146353411126414626253356366163666466232534413661661163252562462255265252266435353336233121625364414432335163243633665562466662632666612355245242";
     public static string sequences = "316664";
     public static double[,] HMMParams;
     public static Dictionary<char, double[]> emissionStates = new Dictionary<char, double[]>();
     public static int maxLenInRolls = Int32.MinValue;
-    public static StateEstimation[][] rolls = new StateEstimation[numStates][];
+    public static StateEstimation[][] HMM = new StateEstimation[numStates][];
     static void Main(string[] args)
     {
-      // initializeTestTransitionAndEmissionStates();
-      initializeTransitionAndEmissionStates();
-      sequences = readAFastaFile(fileDirectory + "GCF_000091665.1_ASM9166v1_genomic.fna");
-      // Console.WriteLine(sequences);
+      bool runTestData = false;
+      if (runTestData) {
+        initializeTestTransitionAndEmissionStates(true);
+      } else {
+        initializeTransitionAndEmissionStates();
+        sequences = readAFastaFile(fileDirectory + "GCF_000091665.1_ASM9166v1_genomic.fna");
+        // Console.WriteLine(sequences);
+      }
 
       initializeTransitionEmissionArray();
-      maxLenInRolls += 2;
 
       // trace back
       traceBack();
-      // print(rolls);
+      // print(HMM);
 
       Console.WriteLine("Press any key to exit.....");
       Console.ReadLine();
@@ -67,27 +69,28 @@ namespace Assignment4
 
     public static void initializeTransitionEmissionArray() {
       for (int i = 0; i < numStates; i++)
-        rolls[i] = new StateEstimation[sequences.Length];
+        HMM[i] = new StateEstimation[sequences.Length];
 
       for (int col = 0; col < sequences.Length; col++) {
         for (int row = 0; row < numStates; row++) {
           char c = validateSequenceChar(sequences[col]);
-          rolls[row][col] = new StateEstimation(numStates);
+          HMM[row][col] = new StateEstimation(numStates);
           if (col == 0) {
-            // rolls[row][col].value = (HMMParams[numStates, row]) * (emissionStates[c][row]);
-            rolls[row][col].value = Math.Log(HMMParams[numStates, row]) + Math.Log(emissionStates[c][row]);
+            // HMM[row][col].value = (HMMParams[numStates, row]) * (emissionStates[c][row]);
+            HMM[row][col].value = Math.Log(HMMParams[numStates, row]) + Math.Log(emissionStates[c][row]);
           } else {
-            rolls[row][col].value = Double.MinValue;
+            HMM[row][col].value = Double.MinValue;
             for (int i = 0; i < numStates; i++) {
-              // double stateValues = (rolls[i][col - 1].value) * (HMMParams[i, row]) * (emissionStates[c][row]);
-              double stateValues = (rolls[i][col - 1].value) + Math.Log(HMMParams[i, row]) + Math.Log(emissionStates[c][row]);
-              rolls[row][col].value = Math.Max(rolls[row][col].value, stateValues);
-              rolls[row][col].allStates[i] = stateValues;
+              // double stateValues = (HMM[i][col - 1].value) * (HMMParams[i, row]) * (emissionStates[c][row]);
+              double stateValues = (HMM[i][col - 1].value) + Math.Log(HMMParams[i, row]) + Math.Log(emissionStates[c][row]);
+              HMM[row][col].value = Math.Max(HMM[row][col].value, stateValues);
+              HMM[row][col].allStates[i] = stateValues;
             }
           }
-          maxLenInRolls = Math.Max(maxLenInRolls, rolls[row][col].ToString().Length);
+          maxLenInRolls = Math.Max(maxLenInRolls, HMM[row][col].ToString().Length);
         }
       }
+      maxLenInRolls += 2;
     }
 
     /// <summary>
@@ -103,13 +106,13 @@ namespace Assignment4
       int prevState = -1;
       for (int j = sequences.Length - 1; j >= 0; j--) {
         if (j == sequences.Length - 1) {
-          prevState = (rolls[state0][j].value > rolls[state1][j].value)  ? state0 : state1;
-          Console.WriteLine(String.Format("Overall log probability {0}", Math.Exp(rolls[prevState][j].value)));
+          prevState = (HMM[state0][j].value > HMM[state1][j].value)  ? state0 : state1;
+          Console.WriteLine(String.Format("Overall log probability {0}", (HMM[prevState][j].value)));
         } else {
           int k = j + 1;
           char c = validateSequenceChar(sequences[k]);
-          prevState = ((prevState == state1 && rolls[state1][k].value == rolls[state1][k].allStates[state1]) || 
-                       (prevState == state0 && rolls[state0][k].value == rolls[state0][k].allStates[state1])) ? state1  : state0;
+          prevState = ((prevState == state1 && HMM[state1][k].value == HMM[state1][k].allStates[state1]) || 
+                       (prevState == state0 && HMM[state0][k].value == HMM[state0][k].allStates[state1])) ? state1  : state0;
         }
         mostProbablePath.Append(prevState.ToString());
         // mostProbablePath.Append(prevState == state0 ? "L" : "F");
@@ -207,19 +210,22 @@ namespace Assignment4
       emissionStates.Add('T', new double[numStates] { 0.25, 0.20 });
     }
 
-    public static void initializeTestTransitionAndEmissionStates() {
-      //HMMParams = new double[numStates + 1, numStates] {
-      //   {0.9, 0.10}, // {0.6, 0.40},
-      //   {0.05, 0.95}, //  {0.17, 0.83},
-      //   {0.52, 0.48} //begin
-      //};
-
-      HMMParams = new double[numStates + 1, numStates] {
-         {0.6, 0.40},
-         {0.17, 0.83},
-         {0.52, 0.48} //begin
-      };
-
+    public static void initializeTestTransitionAndEmissionStates(bool toyExample = true) {
+      if (toyExample) {
+        sequences = "316664";
+        HMMParams = new double[numStates + 1, numStates] {
+           {0.6, 0.40},
+           {0.17, 0.83},
+           {0.52, 0.48} //begin
+        };
+      } else {
+        sequences = "315116246446644245311321631164152133625144543631656626566666651166453132651245636664631636663162326455236266666625151631222555441666566563564324364131513465146353411126414626253356366163666466232534413661661163252562462255265252266435353336233121625364414432335163243633665562466662632666612355245242";
+        HMMParams = new double[numStates + 1, numStates] {
+           {0.9, 0.10}, // {0.6, 0.40},
+           {0.05, 0.95}, //  {0.17, 0.83},
+           {0.52, 0.48} //begin
+        };
+      }
       emissionStates.Add('1', new double[numStates] { 1.0 / 10, 1.0 / 6 }); // 0 = Loaded, 1 = Fair
       emissionStates.Add('2', new double[numStates] { 1.0 / 10, 1.0 / 6 });
       emissionStates.Add('3', new double[numStates] { 1.0 / 10, 1.0 / 6 });
