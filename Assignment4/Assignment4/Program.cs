@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -74,13 +74,13 @@ namespace Assignment4
           char c = validateSequenceChar(sequences[col]);
           rolls[row][col] = new StateEstimation(numStates);
           if (col == 0) {
-            rolls[row][col].value = (HMMParams[numStates, row]) * (emissionStates[c][row]);
-            // rolls[row][col].value = Math.Log(HMMParams[numStates, row]) + Math.Log(emissionStates[c][row]);
+            // rolls[row][col].value = (HMMParams[numStates, row]) * (emissionStates[c][row]);
+            rolls[row][col].value = Math.Log(HMMParams[numStates, row]) + Math.Log(emissionStates[c][row]);
           } else {
             rolls[row][col].value = Double.MinValue;
             for (int i = 0; i < numStates; i++) {
-              double stateValues = (rolls[i][col - 1].value) * (HMMParams[i, row]) * (emissionStates[c][row]);
-              // double stateValues = Math.Log(rolls[i][col - 1].value) + Math.Log(HMMParams[i, row]) + Math.Log(emissionStates[c][row]);
+              // double stateValues = (rolls[i][col - 1].value) * (HMMParams[i, row]) * (emissionStates[c][row]);
+              double stateValues = (rolls[i][col - 1].value) + Math.Log(HMMParams[i, row]) + Math.Log(emissionStates[c][row]);
               rolls[row][col].value = Math.Max(rolls[row][col].value, stateValues);
               rolls[row][col].allStates[i] = stateValues;
             }
