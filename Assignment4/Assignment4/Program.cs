@@ -44,9 +44,9 @@ namespace Assignment4
     public static StateEstimation[][] HMM = new StateEstimation[numStates][];
     static void Main(string[] args)
     {
-      bool runTestData = false;
+      bool runTestData = true;
       if (runTestData) {
-        initializeTestTransitionAndEmissionStates(toyExample: false);
+        initializeTestTransitionAndEmissionStates(toyExample: true);
       } else {
         initializeTransitionAndEmissionStates();
         sequences = readAFastaFile(fileDirectory + "GCF_000091665.1_ASM9166v1_genomic.fna");
@@ -338,7 +338,7 @@ namespace Assignment4
       }
       printToConsoleAndWriteToFile(String.Format("Printing {0} / {1} hits", numHitsToPrnt, hits.Count()));
       for (int i = 0; i < numHitsToPrnt; i++) {
-        printToConsoleAndWriteToFile(String.Format("Location = {0}, Length = {1}", hits[i].start, hits[i].end - hits[i].start + 1));
+        printToConsoleAndWriteToFile(String.Format("Start = {0}, End = {1}, Length = {2}", hits[i].start, hits[i].end, hits[i].end - hits[i].start + 1));
       }
     }
 

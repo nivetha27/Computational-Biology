@@ -14,11 +14,11 @@ Emission States Probabilities
 Overall log probability -539.534824640293
 #hits : 5
 Printing 5 / 5 hits
-Location = 1, Length = 48
-Location = 67, Length = 12
-Location = 113, Length = 67
-Location = 193, Length = 78
-Location = 290, Length = 11
+Start = 1, End = 48, Length = 48
+Start = 67, End = 78, Length = 12
+Start = 113, End = 179, Length = 67
+Start = 193, End = 270, Length = 78
+Start = 290, End = 300, Length = 11
 Rolls     315116246446644245311321631164152133625144543631656626566666
 Viterbi   111111111111111111111111111111111111111111111111000000000000
 
@@ -50,11 +50,11 @@ Emission States Probabilities
 Overall log probability -530.941998288929
 #hits : 5
 Printing 5 / 5 hits
-Location = 1, Length = 48
-Location = 62, Length = 17
-Location = 113, Length = 67
-Location = 193, Length = 75
-Location = 290, Length = 11
+Start = 1, End = 48, Length = 48
+Start = 62, End = 78, Length = 17
+Start = 113, End = 179, Length = 67
+Start = 193, End = 267, Length = 75
+Start = 290, End = 300, Length = 11
 Rolls     315116246446644245311321631164152133625144543631656626566666
 Viterbi   111111111111111111111111111111111111111111111111000000000000
 
@@ -86,11 +86,11 @@ Emission States Probabilities
 Overall log probability -530.079844232947
 #hits : 5
 Printing 5 / 5 hits
-Location = 1, Length = 48
-Location = 62, Length = 17
-Location = 113, Length = 67
-Location = 193, Length = 75
-Location = 290, Length = 11
+Start = 1, End = 48, Length = 48
+Start = 62, End = 78, Length = 17
+Start = 113, End = 179, Length = 67
+Start = 193, End = 267, Length = 75
+Start = 290, End = 300, Length = 11
 Rolls     315116246446644245311321631164152133625144543631656626566666
 Viterbi   111111111111111111111111111111111111111111111111000000000000
 
@@ -122,11 +122,11 @@ Emission States Probabilities
 Overall log probability -530.079844232947
 #hits : 5
 Printing 5 / 5 hits
-Location = 1, Length = 48
-Location = 62, Length = 17
-Location = 113, Length = 67
-Location = 193, Length = 75
-Location = 290, Length = 11
+Start = 1, End = 48, Length = 48
+Start = 62, End = 78, Length = 17
+Start = 113, End = 179, Length = 67
+Start = 193, End = 267, Length = 75
+Start = 290, End = 300, Length = 11
 Rolls     315116246446644245311321631164152133625144543631656626566666
 Viterbi   111111111111111111111111111111111111111111111111000000000000
 
@@ -158,11 +158,11 @@ Emission States Probabilities
 Overall log probability -530.079844232947
 #hits : 5
 Printing 5 / 5 hits
-Location = 1, Length = 48
-Location = 62, Length = 17
-Location = 113, Length = 67
-Location = 193, Length = 75
-Location = 290, Length = 11
+Start = 1, End = 48, Length = 48
+Start = 62, End = 78, Length = 17
+Start = 113, End = 179, Length = 67
+Start = 193, End = 267, Length = 75
+Start = 290, End = 300, Length = 11
 Rolls     315116246446644245311321631164152133625144543631656626566666
 Viterbi   111111111111111111111111111111111111111111111111000000000000
 
@@ -194,11 +194,11 @@ Emission States Probabilities
 Overall log probability -530.079844232947
 #hits : 5
 Printing 5 / 5 hits
-Location = 1, Length = 48
-Location = 62, Length = 17
-Location = 113, Length = 67
-Location = 193, Length = 75
-Location = 290, Length = 11
+Start = 1, End = 48, Length = 48
+Start = 62, End = 78, Length = 17
+Start = 113, End = 179, Length = 67
+Start = 193, End = 267, Length = 75
+Start = 290, End = 300, Length = 11
 Rolls     315116246446644245311321631164152133625144543631656626566666
 Viterbi   111111111111111111111111111111111111111111111111000000000000
 
@@ -230,11 +230,11 @@ Emission States Probabilities
 Overall log probability -530.079844232947
 #hits : 5
 Printing 5 / 5 hits
-Location = 1, Length = 48
-Location = 62, Length = 17
-Location = 113, Length = 67
-Location = 193, Length = 75
-Location = 290, Length = 11
+Start = 1, End = 48, Length = 48
+Start = 62, End = 78, Length = 17
+Start = 113, End = 179, Length = 67
+Start = 193, End = 267, Length = 75
+Start = 290, End = 300, Length = 11
 Rolls     315116246446644245311321631164152133625144543631656626566666
 Viterbi   111111111111111111111111111111111111111111111111000000000000
 
@@ -266,11 +266,11 @@ Emission States Probabilities
 Overall log probability -530.079844232947
 #hits : 5
 Printing 5 / 5 hits
-Location = 1, Length = 48
-Location = 62, Length = 17
-Location = 113, Length = 67
-Location = 193, Length = 75
-Location = 290, Length = 11
+Start = 1, End = 48, Length = 48
+Start = 62, End = 78, Length = 17
+Start = 113, End = 179, Length = 67
+Start = 193, End = 267, Length = 75
+Start = 290, End = 300, Length = 11
 Rolls     315116246446644245311321631164152133625144543631656626566666
 Viterbi   111111111111111111111111111111111111111111111111000000000000
 
@@ -302,11 +302,11 @@ Emission States Probabilities
 Overall log probability -530.079844232947
 #hits : 5
 Printing 5 / 5 hits
-Location = 1, Length = 48
-Location = 62, Length = 17
-Location = 113, Length = 67
-Location = 193, Length = 75
-Location = 290, Length = 11
+Start = 1, End = 48, Length = 48
+Start = 62, End = 78, Length = 17
+Start = 113, End = 179, Length = 67
+Start = 193, End = 267, Length = 75
+Start = 290, End = 300, Length = 11
 Rolls     315116246446644245311321631164152133625144543631656626566666
 Viterbi   111111111111111111111111111111111111111111111111000000000000
 
@@ -338,11 +338,11 @@ Emission States Probabilities
 Overall log probability -530.079844232947
 #hits : 5
 Printing 5 / 5 hits
-Location = 1, Length = 48
-Location = 62, Length = 17
-Location = 113, Length = 67
-Location = 193, Length = 75
-Location = 290, Length = 11
+Start = 1, End = 48, Length = 48
+Start = 62, End = 78, Length = 17
+Start = 113, End = 179, Length = 67
+Start = 193, End = 267, Length = 75
+Start = 290, End = 300, Length = 11
 Rolls     315116246446644245311321631164152133625144543631656626566666
 Viterbi   111111111111111111111111111111111111111111111111000000000000
 
