@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Diagnostics; 
 using System.Threading.Tasks;
 
 namespace Assignment4
@@ -34,7 +35,7 @@ namespace Assignment4
     public const int state0 = 0;
     public const int state1 = 1;
     public const char defaultCharReplaceNonACGT = 'T';
-    public static string fileDirectory = @"C:\Users\nsathya\Documents\GitHub\Computational-Biology\Assignment4\Assignment4\";
+    public static string fileDirectory = @".\..\..\";
     public static string outputFullFileName = fileDirectory + "output" + DateTime.Now.Ticks + ".txt";
     public static StreamWriter sw = new StreamWriter(outputFullFileName, append: true);
     public static string sequences = "316664";
@@ -44,9 +45,10 @@ namespace Assignment4
     public static StateEstimation[][] HMM = new StateEstimation[numStates][];
     static void Main(string[] args)
     {
-      bool runTestData = true;
+      printToConsoleAndWriteToFile("Coded in C#...");
+      bool runTestData = false;
       if (runTestData) {
-        initializeTestTransitionAndEmissionStates(toyExample: true);
+        initializeTestTransitionAndEmissionStates(toyExample: false);
       } else {
         initializeTransitionAndEmissionStates();
         sequences = readAFastaFile(fileDirectory + "GCF_000091665.1_ASM9166v1_genomic.fna");
@@ -62,19 +64,24 @@ namespace Assignment4
     }
 
     public static void EMWithMaxIterations() {
+      var watch = System.Diagnostics.Stopwatch.StartNew();
       for (int i = 1; i <= maxiteration; i++) {
+        if  (i == maxiteration) {
+          watch.Stop();
+        }
         computeHMMForward();
         printTransitionAndEmissionProb();        
         string viterbi = traceBack();
         int viterbiLastIdx = viterbi.Length - 1;
         double curMaxLogProb = HMM[(int)Char.GetNumericValue(viterbi[viterbiLastIdx])][viterbiLastIdx].value;
         printToConsoleAndWriteToFile(String.Format("Overall log probability {0}", curMaxLogProb));
-        int x = i < maxiteration ? maxiteration/2 : Int32.MaxValue;
+        int x = i < maxiteration ? 5 : Int32.MaxValue;
         calculateHits(viterbi,x);
         printViterbiPath(viterbi);
         trainData(viterbi);
         // print(HMM);
       }
+      printToConsoleAndWriteToFile("Total run time : " + watch.ElapsedMilliseconds/1000.0 + "s");
     }
 
     public static void EMWithEpsilon() {

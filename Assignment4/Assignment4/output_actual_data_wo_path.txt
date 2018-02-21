@@ -1,0 +1,220 @@
+Coded in C#...
+Transition States Probabilities
+          state1                       state2                       
+state1    0.9999                       0.0001                       
+state2    0.01                         0.99                         
+begin     0.9999                       0.0001                       
+Emission States Probabilities
+     state1                       state2                       
+A    0.25                         0.2                          
+C    0.25                         0.3                          
+G    0.25                         0.3                          
+T    0.25                         0.2                          
+Overall log probability -2308117.25052028
+#hits : 2
+Printing 2 / 2 hits
+Start = 154651, End = 159579, Length = 4929
+Start = 638464, End = 643447, Length = 4984
+Transition States Probabilities
+          state1                         state2                         
+state1    0.999998791581675              1.20841832542222E-06           
+state2    0.000201755270856451           0.999798244729144              
+begin     0.9999                         0.0001                         
+Emission States Probabilities
+     state1                         state2                         
+A    0.345353060347771              0.186623625542217              
+C    0.154403141402381              0.314637344900636              
+G    0.157977640649234              0.31383032381721               
+T    0.342266157600614              0.184908705739937              
+Overall log probability -2188058.0682831
+#hits : 23
+Printing 5 / 23 hits
+Start = 97326, End = 97541, Length = 216
+Start = 97627, End = 97823, Length = 197
+Start = 111764, End = 111856, Length = 93
+Start = 138345, End = 138419, Length = 75
+Start = 154610, End = 159591, Length = 4982
+Transition States Probabilities
+          state1                           state2                           
+state1    0.999986068281171                1.39317188288391E-05             
+state2    0.00163584637268848              0.998364153627312                
+begin     0.9999                           0.0001                           
+Emission States Probabilities
+     state1                           state2                           
+A    0.345743256749308                0.187624466571835                
+C    0.154033230157913                0.310810810810811                
+G    0.157588239213525                0.313584637268848                
+T    0.342635273879254                0.187980085348506                
+Overall log probability -2187966.08787327
+#hits : 34
+Printing 5 / 34 hits
+Start = 97326, End = 97541, Length = 216
+Start = 97627, End = 97823, Length = 197
+Start = 111764, End = 111856, Length = 93
+Start = 118079, End = 118179, Length = 101
+Start = 138345, End = 138419, Length = 75
+Transition States Probabilities
+          state1                             state2                             
+state1    0.999979398621525                  2.06013784745891E-05               
+state2    0.00232972454433329                0.997670275455667                  
+begin     0.9999                             0.0001                             
+Emission States Probabilities
+     state1                             state2                             
+A    0.345818165072686                  0.184939016033987                  
+C    0.153955825823933                  0.313827600383719                  
+G    0.157513196992685                  0.316362888858435                  
+T    0.342712812110695                  0.184870494723859                  
+Overall log probability -2187960.61108902
+#hits : 35
+Printing 5 / 35 hits
+Start = 97326, End = 97541, Length = 216
+Start = 97627, End = 97823, Length = 197
+Start = 111764, End = 111856, Length = 93
+Start = 118079, End = 118179, Length = 101
+Start = 138345, End = 138419, Length = 75
+Transition States Probabilities
+          state1                               state2                               
+state1    0.999978791657729                    2.12083422711347E-05                 
+state2    0.00238500851788756                  0.997614991482112                    
+begin     0.9999                               0.0001                               
+Emission States Probabilities
+     state1                               state2                               
+A    0.345823625473021                    0.185212947189097                    
+C    0.153951263258993                    0.313458262350937                    
+G    0.157502143556152                    0.316729131175468                    
+T    0.342722967711833                    0.184599659284497                    
+Overall log probability -2187960.57356643
+#hits : 36
+Printing 5 / 36 hits
+Start = 97326, End = 97541, Length = 216
+Start = 97627, End = 97823, Length = 197
+Start = 111764, End = 111856, Length = 93
+Start = 118079, End = 118179, Length = 101
+Start = 138345, End = 138419, Length = 75
+Transition States Probabilities
+          state1                                 state2                                 
+state1    0.999978185361408                      2.18146385920347E-05                   
+state2    0.00244881300591796                    0.997551186994082                      
+begin     0.9999                                 0.0001                                 
+Emission States Probabilities
+     state1                                 state2                                 
+A    0.345829073926736                      0.184885381946806                      
+C    0.15395308280044                       0.312971906673015                      
+G    0.157490081919978                      0.317801510101354                      
+T    0.342727761352846                      0.184341201278825                      
+Overall log probability -2187960.50684505
+#hits : 36
+Printing 5 / 36 hits
+Start = 97326, End = 97541, Length = 216
+Start = 97627, End = 97823, Length = 197
+Start = 111764, End = 111856, Length = 93
+Start = 118079, End = 118179, Length = 101
+Start = 138345, End = 138419, Length = 75
+Transition States Probabilities
+          state1                                   state2                                   
+state1    0.999978185361408                        2.18146385920347E-05                     
+state2    0.00244881300591796                      0.997551186994082                        
+begin     0.9999                                   0.0001                                   
+Emission States Probabilities
+     state1                                   state2                                   
+A    0.345829073926736                        0.184885381946806                        
+C    0.15395308280044                         0.312971906673015                        
+G    0.157490081919978                        0.317801510101354                        
+T    0.342727761352846                        0.184341201278825                        
+Overall log probability -2187960.50684505
+#hits : 36
+Printing 5 / 36 hits
+Start = 97326, End = 97541, Length = 216
+Start = 97627, End = 97823, Length = 197
+Start = 111764, End = 111856, Length = 93
+Start = 118079, End = 118179, Length = 101
+Start = 138345, End = 138419, Length = 75
+Transition States Probabilities
+          state1                                     state2                                     
+state1    0.999978185361408                          2.18146385920347E-05                       
+state2    0.00244881300591796                        0.997551186994082                          
+begin     0.9999                                     0.0001                                     
+Emission States Probabilities
+     state1                                     state2                                     
+A    0.345829073926736                          0.184885381946806                          
+C    0.15395308280044                           0.312971906673015                          
+G    0.157490081919978                          0.317801510101354                          
+T    0.342727761352846                          0.184341201278825                          
+Overall log probability -2187960.50684505
+#hits : 36
+Printing 5 / 36 hits
+Start = 97326, End = 97541, Length = 216
+Start = 97627, End = 97823, Length = 197
+Start = 111764, End = 111856, Length = 93
+Start = 118079, End = 118179, Length = 101
+Start = 138345, End = 138419, Length = 75
+Transition States Probabilities
+          state1                                       state2                                       
+state1    0.999978185361408                            2.18146385920347E-05                         
+state2    0.00244881300591796                          0.997551186994082                            
+begin     0.9999                                       0.0001                                       
+Emission States Probabilities
+     state1                                       state2                                       
+A    0.345829073926736                            0.184885381946806                            
+C    0.15395308280044                             0.312971906673015                            
+G    0.157490081919978                            0.317801510101354                            
+T    0.342727761352846                            0.184341201278825                            
+Overall log probability -2187960.50684505
+#hits : 36
+Printing 5 / 36 hits
+Start = 97326, End = 97541, Length = 216
+Start = 97627, End = 97823, Length = 197
+Start = 111764, End = 111856, Length = 93
+Start = 118079, End = 118179, Length = 101
+Start = 138345, End = 138419, Length = 75
+Transition States Probabilities
+          state1                                         state2                                         
+state1    0.999978185361408                              2.18146385920347E-05                           
+state2    0.00244881300591796                            0.997551186994082                              
+begin     0.9999                                         0.0001                                         
+Emission States Probabilities
+     state1                                         state2                                         
+A    0.345829073926736                              0.184885381946806                              
+C    0.15395308280044                               0.312971906673015                              
+G    0.157490081919978                              0.317801510101354                              
+T    0.342727761352846                              0.184341201278825                              
+Overall log probability -2187960.50684505
+#hits : 36
+Printing 36 / 36 hits
+Start = 97326, End = 97541, Length = 216
+Start = 97627, End = 97823, Length = 197
+Start = 111764, End = 111856, Length = 93
+Start = 118079, End = 118179, Length = 101
+Start = 138345, End = 138419, Length = 75
+Start = 154610, End = 157697, Length = 3088
+Start = 157782, End = 159591, Length = 1810
+Start = 186974, End = 187067, Length = 94
+Start = 190831, End = 190907, Length = 77
+Start = 215200, End = 215296, Length = 97
+Start = 227705, End = 227782, Length = 78
+Start = 291972, End = 291997, Length = 26
+Start = 303990, End = 304080, Length = 91
+Start = 358766, End = 358942, Length = 177
+Start = 359974, End = 360046, Length = 73
+Start = 402969, End = 403057, Length = 89
+Start = 412582, End = 412635, Length = 54
+Start = 552537, End = 552862, Length = 326
+Start = 619161, End = 619236, Length = 76
+Start = 637579, End = 638153, Length = 575
+Start = 638334, End = 640132, Length = 1799
+Start = 640217, End = 643449, Length = 3233
+Start = 643500, End = 643767, Length = 268
+Start = 763767, End = 763845, Length = 79
+Start = 764022, End = 764095, Length = 74
+Start = 774708, End = 774788, Length = 81
+Start = 863476, End = 864151, Length = 676
+Start = 873579, End = 873778, Length = 200
+Start = 883675, End = 883755, Length = 81
+Start = 951852, End = 951968, Length = 117
+Start = 1038544, End = 1038622, Length = 79
+Start = 1129124, End = 1129194, Length = 71
+Start = 1150142, End = 1150402, Length = 261
+Start = 1189943, End = 1190054, Length = 112
+Start = 1313165, End = 1313251, Length = 87
+Start = 1659451, End = 1659520, Length = 70
+Total run time : 20.677s
