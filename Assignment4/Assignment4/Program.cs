@@ -29,7 +29,7 @@ namespace Assignment4
   class Program
   {
     public const double epsilon = 0.001;
-    public const int maxiteration = 10;
+    public const int maxiteration = 100;
     public const int numCharsToPrintPerLine = 60;
     public const int numStates = 2;
     public const int state0 = 0;
@@ -68,6 +68,7 @@ namespace Assignment4
       for (int i = 1; i <= maxiteration; i++) {
         if  (i == maxiteration) {
           watch.Stop();
+          Console.WriteLine("Timer stopped");
         }
         computeHMMForward();
         printTransitionAndEmissionProb();        
@@ -77,7 +78,7 @@ namespace Assignment4
         printToConsoleAndWriteToFile(String.Format("Overall log probability {0}", curMaxLogProb));
         int x = i < maxiteration ? 5 : Int32.MaxValue;
         calculateHits(viterbi,x);
-        printViterbiPath(viterbi);
+        //printViterbiPath(viterbi);
         trainData(viterbi);
         // print(HMM);
       }
@@ -96,7 +97,7 @@ namespace Assignment4
         curMaxLogProb = HMM[(int)Char.GetNumericValue(viterbi[viterbiLastIdx])][viterbiLastIdx].value;
         printToConsoleAndWriteToFile(String.Format("Overall log probability {0}", curMaxLogProb));
         calculateHits(viterbi);
-        printViterbiPath(viterbi);
+        // printViterbiPath(viterbi);
         trainData(viterbi);
         // print(HMM);
       } while(Math.Abs(curMaxLogProb - prevMaxLogProb) > epsilon);
@@ -280,7 +281,7 @@ namespace Assignment4
     
     public static void printTransitionAndEmissionProb() {
       printToConsoleAndWriteToFile("Transition States Probabilities");
-      printToConsoleAndWriteToFile(addTrailiingWhiteSpaces(" ", 10 - 1), false);
+      printToConsoleAndWriteToFile(" ".PadRight(10 - 2), false);
       for (int i = 0; i < numStates; i++) {
         string curState = "state" + (i+1).ToString();
         printToConsoleAndWriteToFile(addTrailiingWhiteSpaces(curState, maxLenInRolls - curState.Length), false);
