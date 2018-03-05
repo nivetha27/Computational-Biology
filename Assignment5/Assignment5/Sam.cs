@@ -46,7 +46,7 @@ namespace Assignment5
       refNameOfNextRead = properties[6];
       Int32.TryParse(properties[7], out posOfNextRead);
       Int32.TryParse(properties[8], out templateLen);
-      ssegmentSeq = properties[9];
+      ssegmentSeq = properties[9].Replace('N', 'T');
       phredScaleQuality = properties[10];
 
       for (int i = 11; i < properties.Length; i++) {

@@ -9,7 +9,7 @@ namespace Assignment5
 {
   class Program
   {
-    public static int countASeqEnd = 1;
+    public static int countASeqEnd = 10;
     static void Main(string[] args)
     {
       string A = null;
@@ -36,12 +36,13 @@ namespace Assignment5
             int putativeClevageIndex;
             var percentage = PercentageMismatchesInPolyTail(sam, out putativeClevageIndex);
             int polyTailLength = sam.ssegmentSeq.Length - putativeClevageIndex;
-            if (polyTailLength > 60)
-            {
-                continue;
-            }
+            //if (polyTailLength > 60)
+            //{
+            //    continue;
+            //}
 
-            if (sam.NM > polyTailLength * 0.7 && percentage > 0.7 && sam.AS < -10)
+            // if (sam.NM > polyTailLength * 0.7 && percentage > 0.7 && sam.AS < -10)
+            if (sam.AS <= -3 && sam.NM >= 5)
             {
               validRecords += 1;
 
