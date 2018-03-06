@@ -30,6 +30,7 @@ namespace Assignment5
     public string YTZ = null;
     public int? YS;
     public int? NH;
+    public int? softClip;
 
     /*
      * input s should be a tab separated
@@ -43,13 +44,25 @@ namespace Assignment5
       Int32.TryParse(properties[3], out pos);
       Int32.TryParse(properties[4], out mappingQuality);
       cigar = properties[5];
+      if (!String.IsNullOrEmpty(cigar) && cigar.IndexOf('S') >= 0) {
+        StringBuilder x = new StringBuilder();
+        for(int k = 0; k < cigar.IndexOf('S'); k++) {
+          if (Char.IsDigit(cigar[k])) {
+            x.Append(cigar[k]);
+          } else {
+            x.Remove(0, x.Length);
+          }
+        }
+
+        softClip = convertOrDefault(x.ToString(), null);
+      }
       refNameOfNextRead = properties[6];
       Int32.TryParse(properties[7], out posOfNextRead);
       Int32.TryParse(properties[8], out templateLen);
       ssegmentSeq = properties[9].Replace('N', 'T');
       phredScaleQuality = properties[10];
 
-      for (int i = 11; i < properties.Length; i++) {
+      for (int i = 10; i < properties.Length; i++) {
         var p = properties[i];
         if (p.StartsWith("AS:I:", StringComparison.InvariantCultureIgnoreCase)) {
           AS = convertOrDefault(p, "AS:I:");
@@ -79,7 +92,7 @@ namespace Assignment5
 
     private int? convertOrDefault(string stringVal, string remove) {
       string x = stringVal;
-      if (!String.IsNullOrEmpty(x))
+      if (!String.IsNullOrEmpty(x) && remove != null)
         x = x.ToUpper().Replace(remove.ToUpper(), null);
       int tempVal;
       int? val = Int32.TryParse(x, out tempVal) ? tempVal : (int?)null;

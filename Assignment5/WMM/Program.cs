@@ -9,6 +9,7 @@ namespace WMM
 {
   public class Program
   {
+    public const int motifLen = 6;
     public const int numNucleotides = 4;
     public const string seqLabel = "SEQ: ";
     public const char cleavageIndicator = ' ';
@@ -16,16 +17,16 @@ namespace WMM
 
     public static string fullInputFileName = @"C:\Users\nsathya\Documents\GitHub\Computational-Biology\Assignment5\WMM\candidates.txt";
     public static string consensus = "AATAAA";
+    public static List<string> reads = new List<string>();
         
-    public static double[,] p0;
-    public static double[,] p1;
+    public static double[][] p0;
+    public static double[][] p1;
 
     public static void Main(string[] args)
     {
       p0 = initializeFrequencies(1, 0);
       p1 = initializeFrequencies(0.85, 0.05);
 
-      List<string> reads = new List<string>();
       using (StreamReader sr = new StreamReader(fullInputFileName)) {
         string s;
         while (!sr.EndOfStream) {
@@ -37,39 +38,43 @@ namespace WMM
           }
         }
       }
-      calculate(reads, p0, "WMM0");
-      calculate(reads, p1, "WMM1");
-      calculate(reads, getP2(reads, p1), "WMM2");
+      calculate(p0, "WMM0");
+      calculate(p1, "WMM1");
+      calculate(getP2(reads, p1), "WMM2");
     }
 
-    public static double[,] initializeFrequencies(double consensusFreq, double nonConsensusFreq) {
-      var frequencies = new double [numNucleotides, consensus.Length];
+    public static double[][] initializeFrequencies(double consensusFreq, double nonConsensusFreq) {
+      var frequencies = new double [numNucleotides][];
       for (int i = 0; i < numNucleotides; i++) {
+        frequencies[i] = new double[consensus.Length];
         for (int j = 0; j < consensus.Length; j++) {
-          frequencies[i, j] = nonConsensusFreq;
+          frequencies[i][j] = nonConsensusFreq;
           if (i == getNucleotideIdx(consensus[j])) {
-            frequencies[i, j] = consensusFreq;
+            frequencies[i][j] = consensusFreq;
           }
         }
       }
       return frequencies;
     }
 
-    public static double[,] computeWMMFromFreq(double[,] freqArray)
+    public static double[][] computeWMMFromFreq(double[][] freqArray)
     {
-      var wmm = new double[freqArray.GetLength(0), freqArray.GetLength(1)];
-      for (int i = 0; i < wmm.GetLength(0); i++)
+      int row = freqArray.Length;
+      int col = freqArray[0].Length;
+      var wmm = new double[row][];
+      for (int i = 0; i < row; i++)
       {
-        for (int j = 0; j < wmm.GetLength(1); j++)
+        wmm[i] = new double[col];
+        for (int j = 0; j < col; j++)
         {
-          wmm[i, j] = Math.Log(freqArray[i, j] / 0.25, 2);
+          wmm[i][j] = Math.Log(freqArray[i][j] / 0.25, 2);
         }
       }
 
       return wmm;
     }
 
-    public static void calculate(List<string> reads, double[,] p, string label)
+    public static void calculate(double[][] p, string label)
     {
       Console.WriteLine(label);
       Console.WriteLine();
@@ -80,7 +85,7 @@ namespace WMM
       print(p);
       Console.WriteLine();
 
-      Console.WriteLine("WMM");
+      Console.WriteLine(label);
       print(wmm);
       Console.WriteLine();
 
@@ -94,13 +99,13 @@ namespace WMM
         // compute best hit
         double bestHitScore = Double.MinValue;
         string bestHitMotif = null;
-        for (int i = 0; i < read.Length - 6; i++)
+        for (int i = 0; i < read.Length - motifLen; i++)
         {
-          var motif = read.Substring(i, 6);
+          var motif = read.Substring(i, motifLen);
           double score = 0;
           for (int j = 0; j < motif.Length; j++)
           {
-            score += wmm[getNucleotideIdx(motif[j]), j];
+            score += wmm[getNucleotideIdx(motif[j])][j];
           }
 
           if (score >= bestHitScore)
@@ -128,16 +133,16 @@ namespace WMM
       Console.WriteLine();
     }
 
-    public static double getRelativeEntropy(double[,] wmm, double[,] p)
+    public static double getRelativeEntropy(double[][] wmm, double[][] p)
     {
       double relativeEntropy = 0;
-      for (int j = 0; j < wmm.GetLength(1); j++)
+      for (int i =  0; i < wmm.Length; i++)
       {
-        for (int i = 0; i < wmm.GetLength(0); i++)
+        for (int j = 0; j < wmm[0].Length; j++)
         {
-          if (p[i, j] != 0)
+          if (p[i][j] != 0)
           {
-            relativeEntropy += (p[i, j] * wmm[i, j]);
+            relativeEntropy += (p[i][j] * wmm[i][j]);
           }
         }
       }
@@ -145,8 +150,10 @@ namespace WMM
       return relativeEntropy;
     }
 
-    public static double[,] getP2(List<string> reads, double[,] p)
+    public static double[][] getP2(List<string> reads, double[][] p)
     {
+      int rowCount = p.Length;
+      int colCount = p[0].Length;
       var aligned = new List<Tuple<string, double>>();
       foreach (var read in reads)
       {
@@ -170,44 +177,48 @@ namespace WMM
       }
 
       var totalWeight = aligned.Sum(s => s.Item2);
-      var weightedFrequencies = new double[p.GetLength(0), p.GetLength(1)];
+      var weightedFrequencies = new double[rowCount][];
+      for (int i =  0; i < weightedFrequencies.Length; i++) {
+        weightedFrequencies[i] = new double[colCount];
+      }
+
       foreach (var sixMer in aligned)
       {
         for (int i = 0; i < sixMer.Item1.Length; i++)
         {
-          weightedFrequencies[getNucleotideIdx(sixMer.Item1[i]), i] += sixMer.Item2;
+          weightedFrequencies[getNucleotideIdx(sixMer.Item1[i])][i] += sixMer.Item2;
         }
       }
 
-      for (int i = 0; i < weightedFrequencies.GetLength(0); i++)
+      for (int i = 0; i < rowCount; i++)
       {
-        for (int j = 0; j < weightedFrequencies.GetLength(1); j++)
+        for (int j = 0; j < colCount; j++)
         {
-          weightedFrequencies[i, j] /= totalWeight;
+          weightedFrequencies[i][j] /= totalWeight;
         }
       }
 
       return weightedFrequencies;
     }
 
-    public static void print(double[,] arr)
+    public static void print(double[][] arr)
     {
-      for (int i = 0; i < arr.GetLength(0); i++)
+      for (int i = 0; i < arr.Length; i++)
       {
-        for (int j = 0; j < arr.GetLength(1); j++)
+        for (int j = 0; j < arr[0].Length; j++)
         {
-          Console.Write("{0}\t", arr[i, j].ToString("G4"));
+          Console.Write("{0}\t", arr[i][j].ToString("G4"));
         }
         Console.WriteLine();
       }
     }
 
-    public static double getProbability(string sixMer, double[,] p)
+    public static double getProbability(string sixMer, double[][] p)
     {
       double probability = 1;
       for (int i = 0; i < sixMer.Length; i++)
       {
-        probability *= (p[getNucleotideIdx(sixMer[i]), i]);
+        probability *= (p[getNucleotideIdx(sixMer[i])][i]);
       }
 
       return probability;
