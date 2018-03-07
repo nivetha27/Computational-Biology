@@ -44,11 +44,12 @@ namespace Assignment5
       Int32.TryParse(properties[3], out pos);
       Int32.TryParse(properties[4], out mappingQuality);
       cigar = properties[5];
-      if (!String.IsNullOrEmpty(cigar) && cigar.IndexOf('S') >= 0) {
+      if (!String.IsNullOrEmpty(cigar) && cigar.LastIndexOf('M') >= 0) {
         StringBuilder x = new StringBuilder();
-        for(int k = 0; k < cigar.IndexOf('S'); k++) {
-          if (Char.IsDigit(cigar[k])) {
-            x.Append(cigar[k]);
+        string tmp = cigar.Substring(cigar.LastIndexOf('M') + 1);
+        for(int k = 0; k < tmp.IndexOf('S'); k++) {
+          if (Char.IsDigit(tmp[k])) {
+            x.Append(tmp[k]);
           } else {
             x.Remove(0, x.Length);
           }

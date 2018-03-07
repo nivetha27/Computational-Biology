@@ -17,29 +17,37 @@ namespace Assignment5
 
     public static string consensus = "AATAAA";
 
-    public static int countASeqEnd = 10;
+    public static int countASeqEnd = 6;
+    public static int alignmentScore = -1;
     public static string inputSamFile = @"C:\Users\nsathya\Documents\GitHub\Computational-Biology\Assignment5\Data\SRR5831944.resorted2.sam";
-    public static string fullInputFileName = @"C:\Users\nsathya\Documents\GitHub\Computational-Biology\Assignment5\WMM\candidates.txt";
+    public static string fullInputFileName = @"C:\Users\nsathya\Desktop\candidates.txt"; // @"C:\Users\nsathya\Downloads\5\5\WMM\WMM\candidates.txt";
     
-    public static List<string> reads = new List<string>();
+    public static List<string> candidates = new List<string>();
 
     static void Main(string[] args)
     {
       bool runFindCandidates = false;
-      if (!runFindCandidates && File.Exists(fullInputFileName)) {
-        using (StreamReader sr = new StreamReader(fullInputFileName)) {
-          string s;
-          while (!sr.EndOfStream) {
-            s = sr.ReadLine();
-            if (s.StartsWith(seqLabel))
-            {
-            string line = s.Replace(seqLabel, null);
-            reads.Add(line.Substring(0, line.IndexOf(cleavageIndicator)));
+      bool runToyExample = false;
+      if (runToyExample) {
+        candidates.Add("CTTCGAAGCGAAAAGTCCTAATAGTAGAAGAACCCTCCATAAACCTGGAGTGACTATATGGATGCCCCCCACCCTACCACACATTCGAAGAAC");
+        candidates.Add("CTCAAAAAAAAAAAAAAAAGATAATGGCTTCTTGAAAAAACAAAGAAATCAACCTGAAGGAATTCCTGATGGCCAAAGCTAGAACAATCTGAG");
+        candidates.Add("CGGTTTAAGAATACATCCTTGTATAATCTGACATACAAATTTGTCATTTCCTGCACATGCACACCATTGTTAAAAAAAAAAAAAAAAAGCCAG");
+      } else {
+        if (!runFindCandidates && File.Exists(fullInputFileName)) {
+          using (StreamReader sr = new StreamReader(fullInputFileName)) {
+            string s;
+            while (!sr.EndOfStream) {
+              s = sr.ReadLine();
+              if (s.StartsWith(seqLabel))
+              {
+              string line = s.Replace(seqLabel, null);
+              candidates.Add(line.Substring(0, line.IndexOf(cleavageIndicator)));
+              }
             }
           }
+        } else {
+          findCandidates();
         }
-      } else {
-        findCandidates();
       }
 
       WMM();
@@ -53,7 +61,7 @@ namespace Assignment5
       double[][] p1 = initializeFrequencies(0.85, 0.05);
       calculate(p0, "WMM0");
       calculate(p1, "WMM1");
-      double[][] p2 = computeP2(reads, p1);
+      double[][] p2 = computeP2(candidates, p1);
       calculate(p2, "WMM2");
     }
 
@@ -76,27 +84,16 @@ namespace Assignment5
           }
 
           if (sam.ssegmentSeq.EndsWith(A)) {
-            int putativeClevageIndex;
-            var percentage = percentageMismatchesInPolyTail(sam, out putativeClevageIndex);
-            int polyTailLength = sam.ssegmentSeq.Length - putativeClevageIndex;
-            //if (polyTailLength > 60)
-            //{
-            //    continue;
-            //}
-
-            // if (sam.NM > polyTailLength * 0.7 && percentage > 0.7 && sam.AS < -10)
-            // if (sam.AS <= -3 && sam.NM >= 5)
-            if (sam.softClip >= 1)
+            if (sam.AS <= alignmentScore && sam.softClip >= countASeqEnd && sam.NM >= 0)
             {
               validRecords += 1;
-
-              Console.WriteLine("[{0}]\t{1}\t{2}\t{3}\t{4}\tAS:{5}\tNM:{6}", validRecords, sam.queryTemplateName, sam.refSeqname, sam.pos, sam.cigar, sam.AS, sam.NM);
-              Console.WriteLine("MD: {0}", sam.MDZ);
-              Console.WriteLine("Putative cleavage location: {0}", putativeClevageIndex + 1);
-              string seq = String.Format("{2}{0} {1}", sam.ssegmentSeq.Substring(0, putativeClevageIndex + 1), sam.ssegmentSeq.Substring(putativeClevageIndex + 1), seqLabel);
+              int putativeClevageIndex = sam.ssegmentSeq.Length - (int)sam.softClip;
+              Console.WriteLine("[{0}]\t{1}\t{2}\t{3}\t{4}\tAS:{5}\tNM:{6}\tMD:{7}", validRecords, sam.queryTemplateName, sam.refSeqname, sam.pos, sam.cigar, sam.AS, sam.NM, sam.MDZ);
+              Console.WriteLine("Putative cleavage location: {0}", putativeClevageIndex);
+              string seq = String.Format("{2}{0} {1}", sam.ssegmentSeq.Substring(0, putativeClevageIndex), sam.ssegmentSeq.Substring(putativeClevageIndex), seqLabel);
               Console.WriteLine(seq);
               Console.WriteLine();
-              reads.Add(seq);
+              candidates.Add(sam.ssegmentSeq.Substring(0, putativeClevageIndex));
             }
           }
         }
@@ -190,7 +187,7 @@ namespace Assignment5
 
       Console.WriteLine("\tMotif\tScore\tLength");
 
-      foreach (var read in reads) {
+      foreach (var read in candidates) {
         // compute best hit
         double bestHitScore = Double.MinValue;
         string bestHitMotif = null;
@@ -216,9 +213,13 @@ namespace Assignment5
         }
       }
 
-      Console.WriteLine("Candidate count = {0}", reads.Count);
-      Console.WriteLine("Candidate count with positive LLR = {0}", positiveLLR);
-      Console.WriteLine("Average distance = {0}", cumulativeDistance / positiveLLR);
+      if (positiveLLR > 0) {
+        Console.WriteLine("Candidate count = {0}", candidates.Count);
+        Console.WriteLine("Candidate count with positive LLR = {0}", positiveLLR);
+        Console.WriteLine("Average distance = {0}", (double)cumulativeDistance / positiveLLR);
+      } else {
+        Console.WriteLine("No match");
+      }
       Console.WriteLine("Relative entropy = {0}", getRelativeEntropy(wmm, p));
 
       Console.WriteLine();
@@ -258,8 +259,10 @@ namespace Assignment5
         }
       }
 
-      for (int i = 0; i < rowCount; i++) {
-        for (int j = 0; j < colCount; j++) {
+      for (int i = 0; i < rowCount; i++)
+      {
+        for (int j = 0; j < colCount; j++)
+        {
           weightedFrequencies[i][j] /= totalWeight;
         }
       }
