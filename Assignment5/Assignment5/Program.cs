@@ -12,7 +12,7 @@ namespace Assignment5
     public const int motifLen = 6;
     public const int numNucleotides = 4;
     public const string seqLabel = "SEQ: ";
-    public const char cleavageIndicator = ' ';
+    public const char cleavageIndicator = '.';
     public enum NucleotideEnum {A,C,G,T};
 
     public static string consensus = "AATAAA";
@@ -20,7 +20,7 @@ namespace Assignment5
     public static int countASeqEnd = 6;
     public static int alignmentScore = -1;
     public static string inputSamFile = @"C:\Users\nsathya\Documents\GitHub\Computational-Biology\Assignment5\Data\SRR5831944.resorted2.sam";
-    public static string fullInputFileName = @"C:\Users\nsathya\Desktop\candidates.txt"; // @"C:\Users\nsathya\Downloads\5\5\WMM\WMM\candidates.txt";
+    public static string candidateFile = @".\..\..\candidates.txt";
     
     public static List<string> candidates = new List<string>();
 
@@ -33,8 +33,8 @@ namespace Assignment5
         candidates.Add("CTCAAAAAAAAAAAAAAAAGATAATGGCTTCTTGAAAAAACAAAGAAATCAACCTGAAGGAATTCCTGATGGCCAAAGCTAGAACAATCTGAG");
         candidates.Add("CGGTTTAAGAATACATCCTTGTATAATCTGACATACAAATTTGTCATTTCCTGCACATGCACACCATTGTTAAAAAAAAAAAAAAAAAGCCAG");
       } else {
-        if (!runFindCandidates && File.Exists(fullInputFileName)) {
-          using (StreamReader sr = new StreamReader(fullInputFileName)) {
+        if (!runFindCandidates && File.Exists(candidateFile)) {
+          using (StreamReader sr = new StreamReader(candidateFile)) {
             string s;
             while (!sr.EndOfStream) {
               s = sr.ReadLine();
@@ -90,7 +90,7 @@ namespace Assignment5
               int putativeClevageIndex = sam.ssegmentSeq.Length - (int)sam.softClip;
               Console.WriteLine("[{0}]\t{1}\t{2}\t{3}\t{4}\tAS:{5}\tNM:{6}\tMD:{7}", validRecords, sam.queryTemplateName, sam.refSeqname, sam.pos, sam.cigar, sam.AS, sam.NM, sam.MDZ);
               Console.WriteLine("Putative cleavage location: {0}", putativeClevageIndex);
-              string seq = String.Format("{2}{0} {1}", sam.ssegmentSeq.Substring(0, putativeClevageIndex), sam.ssegmentSeq.Substring(putativeClevageIndex), seqLabel);
+              string seq = String.Format("{2}{0}{3}{1}", sam.ssegmentSeq.Substring(0, putativeClevageIndex), sam.ssegmentSeq.Substring(putativeClevageIndex), seqLabel, cleavageIndicator);
               Console.WriteLine(seq);
               Console.WriteLine();
               candidates.Add(sam.ssegmentSeq.Substring(0, putativeClevageIndex));
@@ -100,60 +100,6 @@ namespace Assignment5
         Console.Write("{0} Valid Records out of {1}", validRecords, totalRows);
       }
     }
-    
-    public static double percentageMismatchesInPolyTail(Sam record, out int putativeClevageIndex) {
-        putativeClevageIndex = record.ssegmentSeq.Length - 1;
-        var mdCode = record.MDZ;
-
-        int matchCount = 0;
-        int mismatch = 0;
-        int endGenome = Program.endGenome(record.ssegmentSeq);
-        int units = 0;
-        bool isCharSeen = false;
-        for (int i = mdCode.Length - 1; i >= 0 && putativeClevageIndex >= endGenome; i--)
-        {
-            var current = mdCode[i];
-            if (char.IsDigit(current))
-            {
-                matchCount = int.Parse(current.ToString()) * (int)Math.Pow(10, units++) + matchCount;
-            }
-            else if (char.IsLetter(current) && (putativeClevageIndex - matchCount) > endGenome)
-            {
-                isCharSeen = true;
-                putativeClevageIndex -= matchCount;
-
-                matchCount = 0;
-                units = 0;
-
-                if (putativeClevageIndex > endGenome)
-                {
-                    mismatch++;
-                    putativeClevageIndex--;
-                }
-            }
-        }
-
-
-        //if (!isCharSeen) {
-        //  putativeClevageIndex = matchCount;
-        //  if (putativeClevageIndex > endGenome)
-        //  {
-        //      mismatch++;
-        //      putativeClevageIndex--;
-        //  }
-        //}
-
-        return (double)mismatch / (int)record.NM;
-    }
-
-    public static int endGenome(string sequence) {
-        int index = sequence.Length - 1;
-        while (index >= 0 && sequence[index] == 'A') {
-            index--;
-        }
-        return index;
-    }  
-
     
     public static double getRelativeEntropy(double[][] wmm, double[][] p) {
       double relativeEntropy = 0;
@@ -191,7 +137,7 @@ namespace Assignment5
         // compute best hit
         double bestHitScore = Double.MinValue;
         string bestHitMotif = null;
-        for (int i = 0; i < read.Length - motifLen; i++) {
+        for (int i = 0; i <= read.Length - motifLen; i++) {
           var motif = read.Substring(i, motifLen);
           double score = 0;
           for (int j = 0; j < motif.Length; j++) {
@@ -233,7 +179,7 @@ namespace Assignment5
       foreach (var read in reads) {
         var sixMers = new List<SixMer>();
         double sequenceTotalWeight = 0;
-        for (int i = 0; i < read.Length - motifLen; i++) {
+        for (int i = 0; i <= read.Length - motifLen; i++) {
           var sixMer = read.Substring(i, motifLen);
           var probability = getProbability(sixMer, p);
           sixMers.Add(new SixMer(sixMer, probability));
